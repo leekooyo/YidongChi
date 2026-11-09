@@ -2,7 +2,7 @@ plugins { id("com.android.application"); kotlin("android"); id("org.jetbrains.ko
 android {
     namespace = "cn.yidongchi.app"
     compileSdk = 35
-    defaultConfig { applicationId = "cn.yidongchi.app"; minSdk = 26; targetSdk = 35; versionCode = 4; versionName = "0.2.1"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
+    defaultConfig { applicationId = "cn.yidongchi.app"; minSdk = 26; targetSdk = 35; versionCode = 5; versionName = "0.3.0"; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     buildFeatures { compose = true }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }

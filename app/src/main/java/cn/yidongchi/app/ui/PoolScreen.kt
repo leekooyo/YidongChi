@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter
     var rule by remember{mutableStateOf<String?>(null)}
     var onlyWatches by remember{mutableStateOf(false)}
     var ascending by remember{mutableStateOf(true)}
+    var more by remember{mutableStateOf(false)}
     var details by remember{mutableStateOf(false)}
     var expanded by remember{mutableStateOf<String?>(null)}
     val rows=remember(batch,direction,rule,onlyWatches,state.watches,ascending) {
@@ -52,26 +53,27 @@ import java.time.format.DateTimeFormatter
                 Text("全部沪深 A 股")
                 if(batch!=null)Text("${TradingCalendar.nextDays(batch.basis.time.toLocalDate(),1).first().toString().drop(5)} · 指数不变")
             }
-            if(batch!=null) {
-                val intraday=batch.basis.time.toLocalTime()<LocalTime.of(15,0)
-                val label=when{state.poolRunning->"扫描中";batch.complete->"完成";else->"未完成"}
-                Text("${batch.basis.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))} · $label ${batch.processed}/${batch.universe.size}${if(intraday)" · 盘中估算"else ""}",color=MaterialTheme.colorScheme.onSurfaceVariant)
-                if(state.poolRunning)LinearProgressIndicator(progress={batch.processed.toFloat()/batch.universe.size.coerceAtLeast(1)},modifier=Modifier.fillMaxWidth())
+            if(batch!=null)Text("收盘 ${batch.basis.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))} · ${if(batch.complete)"完整结果"else "未完成"}",color=MaterialTheme.colorScheme.onSurfaceVariant)
+            val progress=state.poolProgress
+            val working=progress.batch
+            if(progress.stage.isNotBlank())Text("${progress.stage}${if(state.poolRunning&&working!=null)" ${working.processed}/${working.universe.size}"else ""}",color=MaterialTheme.colorScheme.onSurfaceVariant)
+            if(state.poolRunning) {
+                if(working==null)LinearProgressIndicator(modifier=Modifier.fillMaxWidth())
+                else LinearProgressIndicator(progress={working.processed.toFloat()/working.universe.size.coerceAtLeast(1)},modifier=Modifier.fillMaxWidth())
             }
             if(state.poolError.isNotBlank())Text(state.poolError,color=Amber)
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
-                if(batch!=null)TextButton(onClick={details=true},modifier=Modifier.weight(1f),contentPadding=PaddingValues(0.dp)) {Text("命中 ${batch.rows.size} · 失败 ${batch.failures.size} · 排除 ${batch.exclusions.size}")}
-                if(state.poolRunning) {
-                    OutlinedButton(onClick={state.pausePool()}){Text("暂停扫描")}
-                    if(batch==null)Text("正在读取全市场清单",Modifier.align(Alignment.CenterVertically))
-                }else {
-                    Button(onClick={state.startPool(newBatch=batch?.complete==true)},enabled=!state.poolLoading){Text(when{state.poolLoading->"读取上次记录";batch==null->"开始扫描";batch.complete->"重新扫描";else->"继续扫描"})}
+                Button(onClick={if(state.poolRunning)state.pausePool()else state.startPool()},enabled=!state.poolLoading){Text(if(state.poolRunning)"暂停更新"else if(state.poolLoading)"导入已有缓存"else "更新收盘数据")}
+                if(batch!=null)TextButton(onClick={details=true}) {Text("命中 ${batch.rows.size} · 详情")}
+                Box {
+                    TextButton(onClick={more=true},enabled=!state.poolRunning&&!state.poolLoading){Text("更多")}
+                    DropdownMenu(expanded=more,onDismissRequest={more=false}) {
+                        DropdownMenuItem(text={Text("强制同步本日")},onClick={more=false;state.startPool(newBatch=true)})
+                        DropdownMenuItem(text={Text("重建历史库")},onClick={more=false;state.startPool(newBatch=true,rebuild=true)})
+                    }
                 }
             }
-            if(batch!=null&&!state.poolRunning&&!batch.complete)Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                    if(batch!=null&&batch.failures.isNotEmpty())OutlinedButton(onClick={state.startPool(retry=true)}){Text("重试失败项")}
-                    TextButton(onClick={state.startPool(newBatch=true)}){Text("重扫")}
-            }
+
         }}
         item {Column {
             Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -84,7 +86,7 @@ import java.time.format.DateTimeFormatter
                 TextButton(onClick={ascending=!ascending}){Text("所需幅度 ${if(ascending)"↑"else "↓"}")}
             }
         }}
-        if(rows.isEmpty())item{Panel{Text(when{batch==null->"扫描后查看明日异动候选";state.poolRunning->"已扫描范围暂无符合条件的股票";!batch.complete->"当前已扫描范围暂无结果";else->"当前筛选下没有股票"},fontSize=17.sp)}}
+        if(rows.isEmpty())item{Panel{Text(when{batch==null->"收盘后更新，查看明日候选";state.poolRunning->"更新中，继续显示上次结果";!batch.complete->"更新尚未完成";else->"当前筛选下没有股票"},fontSize=17.sp)}}
         items(rows,key={it.stock.symbol}){row->
             val hit=row.hits.first();val color=if(direction==Direction.UP)Up else Down
             val watched=state.watches.any{it.symbol==row.stock.symbol}
@@ -106,11 +108,13 @@ import java.time.format.DateTimeFormatter
             }
         }
     }
-    if(details&&batch!=null)AlertDialog(onDismissRequest={details=false},title={Text("扫描详情")},text={
+    if(details&&batch!=null)AlertDialog(onDismissRequest={details=false},title={Text("更新详情")},text={
         LazyColumn(Modifier.heightIn(max=400.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+            item{Text("本次请求 ${state.poolProgress.requests} · 历史回补 ${state.poolProgress.repairs}\n失败 ${state.poolProgress.batch?.failures?.size?:batch.failures.size} · 排除 ${batch.exclusions.size}")}
             item{Text("${(batch.outcomes.values.mapNotNull{it.provider}+batch.basis.provider).distinct().joinToString("\n")}\n假设指数不变；公告重置与特殊状态未全面核实。\n排除和失败不等于没有异动。")}
-            val issues=batch.outcomes.filterValues{it.issue!=null}
-            items(batch.universe.filter{it.symbol in issues},key={it.symbol}){s->Text("${s.name} ${s.code} · ${if(issues.getValue(s.symbol).excluded)"排除"else "失败"}\n${issues.getValue(s.symbol).issue}")}
+            val detailBatch=state.poolProgress.batch?:batch
+            val issues=detailBatch.outcomes.filterValues{it.issue!=null}
+            items(detailBatch.universe.filter{it.symbol in issues},key={it.symbol}){s->Text("${s.name} ${s.code} · ${if(issues.getValue(s.symbol).excluded)"排除"else "失败"}\n${issues.getValue(s.symbol).issue}")}
         }
     },confirmButton={TextButton(onClick={details=false}){Text("关闭")}})
 }

@@ -32,7 +32,10 @@ class AppState(app:Application):AndroidViewModel(app) {
     var filter by mutableStateOf("全部")
     var warningsAll by mutableStateOf(store.value("warnings-all","false")=="true");private set
     var active by mutableStateOf(true)
-    private val poolRepository=PoolRepository(java.io.File(app.filesDir,"pool"))
+    private val poolDirectory=java.io.File(app.filesDir,"pool")
+    private val poolHistory=SQLitePoolHistory(app)
+    private val closeSource=AfterCloseRepository(poolDirectory)
+    var poolProgress by mutableStateOf(CloseProgress(""));private set
     var poolBatch by mutableStateOf<PoolBatch?>(null)
     var poolRunning by mutableStateOf(false);private set
     var poolLoading by mutableStateOf(true);private set
@@ -44,33 +47,39 @@ class AppState(app:Application):AndroidViewModel(app) {
     private val eventsLoading=mutableSetOf<String>()
     init {
         workspaces.all.map{it.symbol}.distinct().forEach{symbol->store.cached(symbol)?.let{snapshots[symbol]=it}};viewModelScope.launch {refresh()}
-        viewModelScope.launch {try{poolBatch=withContext(Dispatchers.IO){poolRepository.cached()}}catch(e:Exception){if(e is CancellationException)throw e;poolError="上次扫描记录无法读取，请重新扫描"}finally{poolLoading=false}}
+        viewModelScope.launch {
+            try {
+                poolProgress=CloseProgress("导入已有缓存")
+                val loaded=withContext(Dispatchers.IO) {
+                    LegacyPoolImport(poolDirectory,poolHistory).run()
+                    poolHistory.complete() to poolHistory.pending()
+                }
+                poolBatch=loaded.first?:loaded.second
+                poolProgress=CloseProgress(if(loaded.second!=null)"有未完成更新"else "",loaded.second)
+            }catch(e:CancellationException){throw e}
+            catch(e:Exception){poolError="缓存导入未完成：${e.message}；更新时会继续尝试"}
+            finally{poolLoading=false}
+        }
     }
-    fun startPool(newBatch:Boolean=false,retry:Boolean=false) {
+    fun startPool(newBatch:Boolean=false,retry:Boolean=false,rebuild:Boolean=false) {
         if(poolRunning||poolLoading)return
         poolRunning=true;poolError=""
         poolJob=viewModelScope.launch {
             try {
-                val basis=poolRepository.basis()
-                val old=poolBatch
-                val initial=if(!newBatch&&old?.basis?.time?.toLocalDate()==basis.time.toLocalDate()) {
-                    if(retry)old.retryFailures()else old
-                }else PoolBatch(basis,poolRepository.universe())
-                poolBatch=initial
-                withContext(Dispatchers.IO){poolRepository.save(initial)}
-                PoolScanner(poolRepository).scan(initial,::resets) {batch->
-                    poolBatch=batch
-                    if(batch.processed%20==0)withContext(Dispatchers.IO){poolRepository.save(batch)}
+                val result=withContext(Dispatchers.IO) {
+                    LegacyPoolImport(poolDirectory,poolHistory).run()
+                    AfterCloseUpdater(closeSource,poolHistory).update(::resets,force=newBatch,rebuild=rebuild) {p->
+                        withContext(Dispatchers.Main) {
+                            poolProgress=p
+                            if(poolBatch?.complete!=true&&p.batch!=null)poolBatch=p.batch
+                        }
+                    }
                 }
-            }catch(e:CancellationException){throw e}
-            catch(e:Exception){poolError=e.message?:"扫描失败，请重试"}
-            finally {
-                withContext(NonCancellable) {
-                    try{poolBatch?.let{batch->withContext(Dispatchers.IO){poolRepository.save(batch)}}}
-                    catch(e:Exception){poolError="扫描记录保存失败：${e.message}"}
-                    poolRunning=false
-                }
-            }
+                if(result.complete)poolBatch=result
+                else poolError="${result.failures.size} 只更新失败，点击更新可重试"
+            }catch(e:CancellationException){poolProgress=poolProgress.copy(stage="已暂停，可继续更新");throw e}
+            catch(e:Exception){poolError=e.message?:"更新失败，请重试"}
+            finally{poolRunning=false}
         }
     }
     fun pausePool(){poolJob?.cancel()}

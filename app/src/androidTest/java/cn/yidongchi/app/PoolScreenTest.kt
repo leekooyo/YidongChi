@@ -24,7 +24,7 @@ class PoolScreenTest {
         ui.waitUntil(35_000){!state.busy}
         ui.runOnIdle{state.active=false}
         ui.onNodeWithText("明日池").performClick()
-        ui.onNode(hasText("开始扫描") or hasText("继续扫描") or hasText("重新扫描")).assertExists()
+        ui.onNodeWithText("更新收盘数据").assertExists()
         ui.onNodeWithText("全部沪深 A 股").assertExists()
     }
     @Test fun filterAddWatchAndOpenNextDayWithFlatIndex() {
@@ -74,20 +74,20 @@ class PoolScreenTest {
         try {
             val previous=state.poolBatch
             ui.runOnIdle{state.active=false;state.startPool(newBatch=true)}
-            ui.waitUntil(150_000){state.poolBatch!==previous&&(state.poolBatch?.processed?:0)>=6||state.poolError.isNotBlank()}
+            ui.waitUntil(150_000){(state.poolProgress.batch?.processed?:0)>=100||state.poolError.isNotBlank()}
             assertEquals("",state.poolError)
-            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("暂停扫描"))
-            ui.onNodeWithText("暂停扫描").performScrollTo().assertIsDisplayed().performClick()
+            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("暂停更新"))
+            ui.onNodeWithText("暂停更新").performScrollTo().assertIsDisplayed().performClick()
             ui.waitUntil(35_000){!state.poolRunning}
-            val processed=state.poolBatch!!.processed
+            val processed=state.poolProgress.batch!!.processed
             assertTrue(processed>=6)
             val context=InstrumentationRegistry.getInstrumentation().targetContext
-            assertEquals(processed,PoolCodec.decode(File(context.filesDir,"pool/batch.json").readText()).processed)
-            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("继续扫描"))
-            ui.onNodeWithText("继续扫描").performScrollTo().assertIsDisplayed().performClick()
-            ui.waitUntil(60_000){(state.poolBatch?.processed?:0)>processed||state.poolError.isNotBlank()}
+            assertEquals(processed,SQLitePoolHistory(context).use{it.pending()!!.processed})
+            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("更新收盘数据"))
+            ui.onNodeWithText("更新收盘数据").performScrollTo().assertIsDisplayed().performClick()
+            ui.waitUntil(60_000){(state.poolProgress.batch?.processed?:0)>processed||state.poolError.isNotBlank()}
             assertEquals("",state.poolError)
-            assertTrue(state.poolBatch!!.processed>processed)
+            assertTrue(state.poolProgress.batch!!.processed>processed)
         }finally{
             ui.runOnIdle{state.pausePool()}
             ui.waitUntil(35_000){!state.poolRunning}
