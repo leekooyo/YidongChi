@@ -21,19 +21,30 @@ object TradingCalendar {
 }
 
 object Projection {
-    fun project(stock:Stock,bars:List<Bar>,index:List<Bar>,scenario:Scenario,count:Int=10,resets:ResetDates=ResetDates()):List<ProjectionDay> {
+    fun project(stock:Stock,bars:List<Bar>,index:List<Bar>,scenario:Scenario,count:Int=10,resets:ResetDates=ResetDates(),events:List<OfficialEvent> = emptyList()):List<ProjectionDay> {
+        require(!stock.excludedFromDeviation){"该特殊交易阶段不参与本工具异动推演"}
+        require(bars.last().eligible||SecurityEligibility.initialExempt(stock,bars.last().date)){"当前为无涨跌幅限制或资格未确认阶段，不能推断未来适用状态"}
         val history=bars.toMutableList();val ix=index.toMutableList();val days=TradingCalendar.nextDays(history.last().date,count)
-        val results=mutableListOf<ProjectionDay>();var seen=false;var state=resets
+        val results=mutableListOf<ProjectionDay>();var seen=false;var state=resets;var normalReset=resets.normal
+        val scenarioEvents=events.toMutableList()
         for((i,date) in days.withIndex()) {
             val prev=history.last().close;val indexPrev=ix.last().close
             val stockPct=scenario.stockPath.getOrNull(i)?:scenario.dailyStockPercent
             val indexPct=scenario.indexPath.getOrNull(i)?:scenario.dailyIndexPercent
+            val eligible=SecurityEligibility.eligible(stock,date)
+            require(scenario.limitPath==0||eligible){"该目标日为无涨跌幅限制阶段，不能使用连续涨跌停情景"}
             val close=when(scenario.limitPath) {1->PriceEngine.limits(stock,prev).second;-1->PriceEngine.limits(stock,prev).first;else->PriceEngine.tick(prev.multiply(BigDecimal.ONE.add(stockPct.movePointLeft(2))),stock.tick,RoundingMode.HALF_UP)}
             val indexClose=indexPrev.multiply(BigDecimal.ONE.add(indexPct.movePointLeft(2)),MC)
-            history+=Bar(date,close,prev);ix+=Bar(date,indexClose,indexPrev)
+            history+=Bar(date,close,prev,eligible=eligible);ix+=Bar(date,indexClose,indexPrev)
             val analysis=PriceEngine.analyze(stock,history,ix,date,indexClose,state)
             val hit=analysis.levels.any {it.satisfied}
-            results+=ProjectionDay(date,close,indexClose,analysis,hit&&!seen,seen)
+            // 仅在独立的“假设次日重置”路径内构造非重叠事件；永不写入正式事件库。
+            if(scenario.simulateReset) {
+                val ordinary=PriceEngine.analyze(stock,history,ix,date,indexClose,ResetDates(normalReset,state.severe)).levels.firstOrNull {it.ruleId=="normal"&&it.satisfied}
+                if(ordinary!=null) {scenarioEvents+=OfficialEvent("scenario-$date",stock.symbol,date,"normal",ordinary.direction,"scenario",true);normalReset=TradingCalendar.nextDays(date,1).first()}
+            }
+            val directions=EventLogic.directionCounts(scenarioEvents,ix.map {it.date},date,stock.board,state.severe)
+            results+=ProjectionDay(date,close,indexClose,analysis,hit&&!seen,seen,directions)
             if(scenario.simulateReset&&hit) {
                 val next=TradingCalendar.nextDays(date,1).first()
                 state=ResetDates(if(analysis.levels.any {it.ruleId=="normal"&&it.satisfied})next else state.normal,if(analysis.levels.any {it.ruleId!="normal"&&it.satisfied})next else state.severe)

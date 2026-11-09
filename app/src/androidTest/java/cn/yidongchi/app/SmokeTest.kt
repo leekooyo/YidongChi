@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import android.graphics.Bitmap
 import android.content.pm.ActivityInfo
 import java.io.File
+import androidx.lifecycle.ViewModelProvider
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,12 +22,15 @@ class SmokeTest {
         file.outputStream().use {ui.onRoot().captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG,100,it)}
     }
     @Test fun liveCalculationWatchlistForecastAndRuleNavigation() {
-        ui.activity.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        ui.waitForIdle()
+        if(ui.onAllNodesWithText("开始使用").fetchSemanticsNodes().isNotEmpty())ui.onNodeWithText("开始使用").performClick()
+        ui.runOnIdle {val state=ViewModelProvider(ui.activity)[AppState::class.java];state.remove("sh600000");state.select("sh600000")}
         ui.onNodeWithText("计算").performClick()
         ui.waitUntil(35_000) {ui.onAllNodesWithText("浦发银行").fetchSemanticsNodes().isNotEmpty()}
         capture("calculation")
         ui.onNodeWithContentDescription("切换自选").performClick()
         ui.onNodeWithText("自选").performClick()
+        ui.onNodeWithTag("watchlist").performScrollToNode(hasText("浦发银行"))
         ui.onNodeWithText("浦发银行").assertIsDisplayed()
         capture("watchlist")
         ui.onNodeWithText("推演").performClick()

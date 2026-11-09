@@ -29,18 +29,26 @@ import java.time.LocalDate
         }
         if(s==null){Note("先选择股票获取行情");return@Column}
         Text("${s.quote.stock.name} · 最近 10 个交易日",fontWeight=FontWeight.Bold)
+        Note("截至基准行情日 ${s.indexQuote.time.toLocalDate()}；${if(state.errors.containsKey(state.selected))"当前为缓存，先刷新核对。" else "按市场交易日筛选。"}")
         Note(state.eventStatus,Amber)
         Row {TextButton(onClick={scope.launch{state.loadEvents()}}){Text("刷新事件源")};TextButton(onClick={record=true}){Text("按原公告补充确认记录")}}
         val recent=state.recent(s)
+        val directionCounts=EventLogic.directionCounts(recent,s.indexBars.map{it.date},s.quote.time.toLocalDate(),s.quote.stock.board,state.resets(state.selected).severe)
+        Panel {Text("10日内同向普通异动次数",fontWeight=FontWeight.Bold);Text("上行 ${directionCounts.up}/${directionCounts.threshold} · 下行 ${directionCounts.down}/${directionCounts.threshold}")
+            if(directionCounts.triggered)Pill("已确认记录满足同向多次严重异动条件",Up)
+            Note("仅统计去重且方向已确认的普通事件；记录源覆盖不全时，未达到不能认定未触发。",Amber)
+        }
         if(recent.isEmpty())Panel {Text("本地未收录近期事件");Note("这不等于近十日没有异动；免费记录源覆盖可能不足，请核对交易所公告。",Amber)}
         recent.forEach {e->Panel {Text("${e.date} · ${when(e.kind){"severe10"->"10日严重异动";"severe30"->"30日严重异动";else->"普通异动"}}",fontWeight=FontWeight.SemiBold);Pill(if(e.confirmed)"用户依据原公告确认" else "行情源候选 · 待核对",if(e.confirmed)Accent else Amber);TextButton(onClick={openLink(context,e.sourceUrl)}){Text("查看记录来源")}
             if(e.confirmed&&e.kind!="normal") {val elapsed=s.bars.count {it.date>e.date};Note("事件后已记录 $elapsed 个交易日；10日申报速率监管的起算、停牌和重复事件仍需按公告核对。",Amber)}
         }}
         val sessions=s.bars.map {it.date}.takeLast(10)
-        val replays=remember(s) {sessions.map {date->date to PriceEngine.analyze(s.quote.stock,s.bars.filter {it.date<=date},s.indexBars.filter {it.date<=date},date,s.indexBars.last {it.date<=date}.close,state.resets(state.selected)).levels.filter {it.ruleId!="normal"&&it.satisfied}}.filter {it.second.isNotEmpty()}}
+        val replayAnalyses=remember(s,state.message) {PriceEngine.replay(s.quote.stock,s.bars,s.indexBars,state.resets(state.selected))}
+        val replays=replayAnalyses.map{it.targetDate to it.levels.filter{l->l.ruleId!="normal"&&l.satisfied}}.filter{it.second.isNotEmpty()}
         Section("近期价格条件复算","按现有参考数据与重置条件回放；不是官方事件计数。") {
             Panel {if(replays.isEmpty())Note("现有条件下未复算出10/30日严重异动价格命中。")
                 replays.forEach {(date,levels)->Text("$date · ${levels.map {it.label}.distinct().joinToString("、")}")}
+                if(replayAnalyses.size<sessions.size)Note("${sessions.size-replayAnalyses.size} 个目标日缺少对应指数，已跳过复算。",Amber)
                 Note("重叠窗口不作为多次官方异动。历史证券状态、停牌和除权资料不足时仅供条件核对。",Amber)
             }
         }

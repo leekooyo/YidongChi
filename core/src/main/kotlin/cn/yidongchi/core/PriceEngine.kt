@@ -21,14 +21,16 @@ object PriceEngine {
             tick(previous.multiply(one.add(stock.board.limit)),stock.tick,RoundingMode.HALF_UP).max(previous.add(stock.tick))
 
     fun analyze(stock:Stock,bars:List<Bar>,index:List<Bar>,targetDate:LocalDate,indexPrice:BigDecimal,resets:ResetDates=ResetDates()):Analysis {
-        val currentBar=bars.last {it.date==targetDate}
+        val eligibleBars=SecurityEligibility.apply(stock,bars)
+        val currentBar=eligibleBars.last {it.date==targetDate}
         val indexByDate=index.associateBy {it.date}
         val (lower,upper)=limits(stock,currentBar.previousClose)
         if(!currentBar.eligible||indexByDate[targetDate]==null) return Analysis(targetDate,currentBar.close,currentBar.previousClose,indexPrice,emptyList(),lower,upper)
-        val history=bars.filter {it.date<=targetDate}.sortedBy {it.date}
+        val history=eligibleBars.filter {it.date<=targetDate}.sortedBy {it.date}
         val output=mutableListOf<PriceLevel>()
+        val all=mutableListOf<PriceLevel>()
         for((ruleId,days) in listOf("normal" to 3,"severe10" to 10,"severe30" to 30)) {
-            val reset=if(ruleId=="normal")resets.normal else resets.severe
+            val reset=(if(ruleId=="normal")resets.normal else resets.severe)?.takeIf {it<=targetDate}
             val candidates=mutableListOf<PriceLevel>()
             for(length in 1..minOf(days,history.size)) {
                 val window=history.takeLast(length)
@@ -48,9 +50,10 @@ object PriceEngine {
                     if(price<stock.tick && direction==Direction.DOWN) continue
                     val reachable=if(direction==Direction.UP)price<=upper else price>=lower
                     val satisfied=if(direction==Direction.UP)exactDeviation>=ExactRatio.from(target) else exactDeviation<=ExactRatio.from(target)
-                    candidates+=PriceLevel(ruleId,when(ruleId){"normal"->"3日异常";"severe10"->"10日严重异动";else->"30日严重异动"},direction,window.first().date,targetDate,length,price,raw.decimal(),deviation,target,reachable,satisfied)
+                    candidates+=PriceLevel(ruleId,when(ruleId){"normal"->"3日异常";"severe10"->"10日严重异动";else->"30日严重异动"},direction,window.first().date,targetDate,length,price,raw.decimal(),deviation,target,reachable,satisfied,base.decimal(),ix.first().previousClose,indexPrice)
                 }
             }
+            all+=candidates
             for(direction in Direction.entries) {
                 val filtered=candidates.filter {it.direction==direction}
                 val best=if(direction==Direction.UP)filtered.sortedWith(compareBy<PriceLevel>{it.price}.thenBy{it.start}).firstOrNull()
@@ -58,6 +61,10 @@ object PriceEngine {
                 best?.let(output::add)
             }
         }
-        return Analysis(targetDate,currentBar.close,currentBar.previousClose,indexPrice,output,lower,upper)
+        return Analysis(targetDate,currentBar.close,currentBar.previousClose,indexPrice,output,lower,upper,all)
+    }
+    fun replay(stock:Stock,bars:List<Bar>,index:List<Bar>,resets:ResetDates):List<Analysis> = bars.takeLast(10).mapNotNull {b->
+        val ix=index.firstOrNull {it.date==b.date}?:return@mapNotNull null
+        analyze(stock,bars.filter {it.date<=b.date},index.filter {it.date<=b.date},b.date,ix.close,resets)
     }
 }

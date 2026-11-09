@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ fun BigDecimal.pct()=movePointRight(2).setScale(2,RoundingMode.HALF_UP).toPlainS
 fun openLink(context:Context,url:String){context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))}
 fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(ClipData.newPlainText("异动尺",text))}
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable fun YidongApp(state:AppState) {
     val dark=when(state.theme){"dark"->true;"light"->false;else->isSystemInDarkTheme()}
     val colors=if(dark)darkColorScheme(primary=Color(0xFFB8D989),primaryContainer=Color(0xFF294E48),secondary=Color(0xFF87BCB3),secondaryContainer=Color(0xFF29413D),background=Color(0xFF101D23),surface=Color(0xFF172830))
@@ -47,6 +49,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
     MaterialTheme(colorScheme=colors) {
         var page by remember {mutableIntStateOf(0)}
         var settings by remember {mutableStateOf(false)}
+        var intro by remember {mutableStateOf(state.store.value("intro")!="done")}
         val snackbar=remember {SnackbarHostState()}
         val owner=LocalLifecycleOwner.current
         DisposableEffect(owner){val observer=LifecycleEventObserver {_,e->if(e==Lifecycle.Event.ON_START)state.active=true else if(e==Lifecycle.Event.ON_STOP)state.active=false};owner.lifecycle.addObserver(observer);onDispose{owner.lifecycle.removeObserver(observer)}}
@@ -61,7 +64,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
             val icons=listOf(Icons.Outlined.StarOutline,Icons.Outlined.Calculate,Icons.Outlined.Timeline,Icons.Outlined.NotificationsNone,Icons.Outlined.MenuBook)
             labels.forEachIndexed {i,s->NavigationBarItem(selected=page==i,onClick={page=i},icon={Icon(icons[i],s)},label={Text(s)})}
         }}) {padding->
-            Box(Modifier.fillMaxSize().padding(padding)) {when(page){
+            PullToRefreshBox(isRefreshing=state.busy,onRefresh={state.refreshNow()},modifier=Modifier.fillMaxSize().padding(padding)) {when(page){
                 0->WatchScreen(state,onOpen={state.select(it);page=1})
                 1->CalculationScreen(state)
                 2->ForecastScreen(state)
@@ -70,6 +73,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
             }}
         }
         if(settings)SettingsDialog(state){settings=false}
+        if(intro)AlertDialog(onDismissRequest={intro=false;state.store.put("intro","done")},title={Text("欢迎使用异动尺")},text={Text("先搜索一只股票，点星号加入自选。计算页看今天和明天的临界价；推演页查看未来十个交易日。点价格可查看公式和窗口，向下拉动页面可刷新。")},confirmButton={TextButton(onClick={intro=false;state.store.put("intro","done")}){Text("开始使用")}},dismissButton={TextButton(onClick={intro=false;state.store.put("intro","done")}){Text("跳过")}})
     }
 }
 

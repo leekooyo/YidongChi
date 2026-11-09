@@ -16,17 +16,18 @@ enum class Board(val label:String,val indexSymbol:String,val normal:BigDecimal,v
     SH_B("沪市B股","sh000003",".20".bd(),".001".bd(),".10".bd(),"USD"),
     SZ_B("深市B股","sz399108",".20".bd(),".01".bd(),".10".bd(),"HKD")
 }
-data class Stock(val symbol:String,val name:String,val board:Board) {
+data class Stock(val symbol:String,val name:String,val board:Board,val listedOn:LocalDate?=null,val excludedFromDeviation:Boolean=false) {
     val code get()=symbol.drop(2)
     val tick get()=board.tick
 }
 data class Bar(val date:LocalDate,val close:BigDecimal,val previousClose:BigDecimal,val high:BigDecimal=close,val low:BigDecimal=close,val turnover:BigDecimal?=null,val eligible:Boolean=true)
 enum class Direction { UP, DOWN }
 data class ResetDates(val normal:LocalDate?=null,val severe:LocalDate?=null)
-data class PriceLevel(val ruleId:String,val label:String,val direction:Direction,val start:LocalDate,val end:LocalDate,val sessions:Int,val price:BigDecimal,val theoretical:BigDecimal,val deviation:BigDecimal,val threshold:BigDecimal,val reachable:Boolean,val satisfied:Boolean)
-data class Analysis(val targetDate:LocalDate,val current:BigDecimal,val previousClose:BigDecimal,val indexPrice:BigDecimal,val levels:List<PriceLevel>,val lowerLimit:BigDecimal,val upperLimit:BigDecimal)
+data class PriceLevel(val ruleId:String,val label:String,val direction:Direction,val start:LocalDate,val end:LocalDate,val sessions:Int,val price:BigDecimal,val theoretical:BigDecimal,val deviation:BigDecimal,val threshold:BigDecimal,val reachable:Boolean,val satisfied:Boolean,val basePrice:BigDecimal=BigDecimal.ZERO,val indexStart:BigDecimal=BigDecimal.ZERO,val indexEnd:BigDecimal=BigDecimal.ZERO)
+data class Analysis(val targetDate:LocalDate,val current:BigDecimal,val previousClose:BigDecimal,val indexPrice:BigDecimal,val levels:List<PriceLevel>,val lowerLimit:BigDecimal,val upperLimit:BigDecimal,val allLevels:List<PriceLevel> = levels)
 data class OfficialEvent(val id:String,val symbol:String,val date:LocalDate,val kind:String,val direction:Direction?,val sourceUrl:String,val confirmed:Boolean=true,val monitorThrough:LocalDate?=null)
 data class Scenario(val name:String="价格不变",val dailyStockPercent:BigDecimal=BigDecimal.ZERO,val dailyIndexPercent:BigDecimal=BigDecimal.ZERO,val stockPath:List<BigDecimal> = emptyList(),val indexPath:List<BigDecimal> = emptyList(),val limitPath:Int=0,val simulateReset:Boolean=false)
-data class ProjectionDay(val date:LocalDate,val close:BigDecimal,val indexClose:BigDecimal,val analysis:Analysis,val firstTrigger:Boolean,val afterHypotheticalTrigger:Boolean)
+data class ProjectionDay(val date:LocalDate,val close:BigDecimal,val indexClose:BigDecimal,val analysis:Analysis,val firstTrigger:Boolean,val afterHypotheticalTrigger:Boolean,val directions:DirectionCounts=DirectionCounts(0,0,4))
+data class DirectionCounts(val up:Int,val down:Int,val threshold:Int) {val triggered get()=up>=threshold||down>=threshold}
 data class WatchItem(val symbol:String,val name:String,val group:String="默认",val pinned:Boolean=false,val muted:Boolean=false)
 data class AlertItem(val key:String,val symbol:String,val text:String,val date:LocalDate,val read:Boolean=false)

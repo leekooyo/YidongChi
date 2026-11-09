@@ -11,6 +11,7 @@ import java.time.LocalDate
 
 class MarketRepository {
     private val historyCache=java.util.concurrent.ConcurrentHashMap<String,Pair<Long,List<Bar>>>()
+    private val metadataCache=java.util.concurrent.ConcurrentHashMap<String,Stock>()
     private fun get(url:String,gbk:Boolean=false):String {
         val conn=URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout=12_000;conn.readTimeout=15_000
@@ -21,7 +22,12 @@ class MarketRepository {
     suspend fun load(symbol:String):MarketSnapshot=withContext(Dispatchers.IO) {
         val index=Watchlist.boardFor(symbol).indexSymbol
         val quotes=get("https://qt.gtimg.cn/q=$symbol,$index",true).split(';').filter {it.contains("~")}
-        val q=MarketParser.quote(symbol,quotes.first {it.contains("v_$symbol=")})
+        val rawQuote=MarketParser.quote(symbol,quotes.first {it.contains("v_$symbol=")})
+        val stock=metadataCache[symbol]?:try {
+            val secid=(if(symbol.startsWith("sh"))"1." else "0.")+symbol.drop(2)
+            MarketParser.stockMetadata(rawQuote.stock,get("https://push2.eastmoney.com/api/qt/stock/get?secid=$secid&fields=f189")).also {metadataCache[symbol]=it}
+        }catch(e:Exception) {if(e is CancellationException)throw e;rawQuote.stock}
+        val q=rawQuote.copy(stock=stock.copy(name=rawQuote.stock.name,excludedFromDeviation=rawQuote.stock.excludedFromDeviation))
         val iq=MarketParser.quote(index,quotes.first {it.contains("v_$index=")})
         require(q.time.toLocalDate()==iq.time.toLocalDate()){ "个股与基准指数行情日期不一致，请稍后刷新" }
         fun history(s:String):List<Bar> {
@@ -47,7 +53,9 @@ class MarketRepository {
             val current=Bar(date,quote.price,quote.previousClose,quote.high,quote.low,eligible=quote.upper!=null||quote.stock.symbol==index)
             return old+current
         }
-        val bars=integrate(pair.first,q);val ix=integrate(pair.second,iq)
+        val bars=integrate(pair.first,q).let {history->
+            if(stock.listedOn==null&&history.size<35)history.map {it.copy(eligible=false)} else history
+        };val ix=integrate(pair.second,iq)
         require(bars.size>=2&&ix.size>=2){"历史日线不足，暂时不能推算"}
         // 不补造停牌日；有历史停牌或参考价不全时维持条件估算标记。
         MarketSnapshot(q,iq,bars,ix,provider)

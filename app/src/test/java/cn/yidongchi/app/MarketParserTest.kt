@@ -27,4 +27,19 @@ class MarketParserTest {
         assertEquals("normal",MarketParser.eventKind("连续三个交易日内收盘价格涨幅偏离值累计达到20%的证券"))
         assertEquals("severe30",MarketParser.eventKind("连续三十个交易日内收盘价格涨幅偏离值累计达到200%的证券"))
     }
+    @Test fun listingMetadataMakesInitialExemptDaysExplicit() {
+        val stock=MarketParser.stockMetadata(Stock("sz001234","新股",Board.SZ_MAIN),"""{"data":{"f189":20261102}}""")
+        assertEquals(LocalDate.parse("2026-11-02"),stock.listedOn)
+        assertFalse(SecurityEligibility.eligible(stock,LocalDate.parse("2026-11-06")))
+    }
+    @Test fun recentSnapshotEventsUseMarketCalendarThroughStockSuspension() {
+        val fields=MutableList(50){"0"};fields[1]="浦发";fields[3]="10";fields[4]="10";fields[30]="20261109100000";fields[33]="10";fields[34]="10"
+        val q=MarketParser.quote("sh600000","x=\"${fields.joinToString("~")}\"")
+        val dates=TradingCalendar.nextDays(LocalDate.parse("2026-10-15"),16)
+        val ix=dates.map {Bar(it,"100".bd(),"100".bd())}
+        val s=MarketSnapshot(q,q,listOf(Bar(dates.first(),"10".bd(),"10".bd()),Bar(dates.last(),"10".bd(),"10".bd())),ix)
+        val old=OfficialEvent("old",q.stock.symbol,dates.first(),"normal",Direction.UP,"https://www.sse.com.cn/")
+        val suspended=old.copy(id="suspended",date=dates[10])
+        assertEquals(listOf(suspended),s.recent(listOf(old,suspended)))
+    }
 }

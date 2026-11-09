@@ -9,9 +9,16 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class Quote(val stock:Stock,val price:BigDecimal,val previousClose:BigDecimal,val time:LocalDateTime,val high:BigDecimal,val low:BigDecimal,val upper:BigDecimal?,val lower:BigDecimal?,val volume:BigDecimal=BigDecimal.ZERO)
-data class MarketSnapshot(val quote:Quote,val indexQuote:Quote,val bars:List<Bar>,val indexBars:List<Bar>,val provider:String="腾讯公开行情",val notes:String="历史按行情源前复权收益估算；公告重置、历史状态与除权参考未全面核实。")
+data class MarketSnapshot(val quote:Quote,val indexQuote:Quote,val bars:List<Bar>,val indexBars:List<Bar>,val provider:String="腾讯公开行情",val notes:String="历史按行情源前复权收益估算；公告重置、历史状态与除权参考未全面核实。",val recordedResets:ResetDates?=null,val ruleVersion:String="2026-07-06-v1") {
+    fun recent(events:List<OfficialEvent>)=Projection.recentEvents(events.filter {it.symbol==quote.stock.symbol},indexBars.map {it.date},quote.time.toLocalDate())
+}
 
 object MarketParser {
+    fun stockMetadata(stock:Stock,text:String):Stock {
+        val raw=JSONObject(text).getJSONObject("data").getInt("f189").toString()
+        val date=LocalDate.parse(raw,DateTimeFormatter.BASIC_ISO_DATE)
+        return stock.copy(listedOn=date)
+    }
     fun eventKind(reason:String):String?=when {
         !reason.contains("偏离")&&!reason.contains("异常")->null
         reason.contains("三十个交易日")||reason.contains("30个交易日")->"severe30"
@@ -24,7 +31,7 @@ object MarketParser {
         require(body.contains('~')) {"未找到该股票行情"}
         val f=body.split('~')
         val price=f[3].bd();require(price.signum()>0){"该股票暂无有效成交价"}
-        val stock=Stock(symbol,f[1],Watchlist.boardFor(symbol))
+        val stock=Stock(symbol,f[1],Watchlist.boardFor(symbol),excludedFromDeviation=symbol.startsWith("sz")&&f[1].contains("退"))
         fun optional(i:Int)=f.getOrNull(i)?.toBigDecimalOrNull()?.takeIf {it.signum()>0}
         return Quote(stock,price,f[4].bd(),LocalDateTime.parse(f[30],DateTimeFormatter.ofPattern("yyyyMMddHHmmss")),f[33].bd(),f[34].bd(),optional(47),optional(48),optional(6)?:BigDecimal.ZERO)
     }

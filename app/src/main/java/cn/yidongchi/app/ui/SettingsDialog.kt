@@ -22,6 +22,7 @@ import cn.yidongchi.app.*
         Row {Checkbox(state.large,{state.setting("large",it.toString())});Text("更大的价格数字",Modifier.padding(top=12.dp))}
         OutlinedTextField(state.threshold,{v->if(v.isBlank()||v.toBigDecimalOrNull()?.let {it>=java.math.BigDecimal.ZERO&&it<="100".toBigDecimal()}==true)state.setting("threshold",v)},label={Text("临界价接近提醒（占现价 %）")},singleLine=true)
         Note("提醒仅在 APP 前台刷新时生成。可在单股管理中静音。")
+        listOf("alert-price" to "价格条件提醒","alert-event" to "已确认近期严重异动提醒","alert-data" to "行情过期 / 缺失提醒").forEach{(key,label)->var enabled by remember{mutableStateOf(state.store.value(key,"true")=="true")};Row{Checkbox(enabled,{enabled=it;state.store.put(key,it.toString())});Text(label,Modifier.padding(top=12.dp))}}
         HorizontalDivider()
         TextButton(onClick={export.launch("异动尺自选备份.json")}){Text("导出自选 / 设置备份")}
         TextButton(onClick={import.launch(arrayOf("application/json","text/plain"))}){Text("导入并合并备份")}
