@@ -8,6 +8,7 @@ interface PoolHistoryStore {
     fun complete():PoolBatch?
     fun pending():PoolBatch?
     fun begin(batch:PoolBatch,clearQuotes:Boolean=false)
+    // Merge this chunk's outcomes and its history writes in one transaction.
     fun checkpoint(batch:PoolBatch,writes:List<HistoryWrite> = emptyList())
     fun finish(batch:PoolBatch)
     fun quotes(date:LocalDate):Map<String,String>

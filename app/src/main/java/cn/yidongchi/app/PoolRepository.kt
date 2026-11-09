@@ -8,6 +8,7 @@ import java.io.File
 import java.time.LocalDate
 
 class PoolRepository(private val directory:File,private val request:((String,Boolean)->String)?=null):PoolSource {
+    var requestCount=0;private set
     private val market=MarketRepository()
     private val indexSymbols=listOf("sh000002","sz399107","sh000688","sz399102")
     private val requestGate=Mutex()
@@ -17,7 +18,7 @@ class PoolRepository(private val directory:File,private val request:((String,Boo
     private var alternate:PoolBasis?=null
     private val alternateProvider="腾讯即时报价 / 东方财富前复权日线"
     init {directory.mkdirs()}
-    private suspend fun fetch(url:String,gbk:Boolean=false):String {
+    internal suspend fun fetch(url:String,gbk:Boolean=false):String {
         currentCoroutineContext().ensureActive()
         requestGate.withLock {delay((100L-(System.currentTimeMillis()-lastRequest)).coerceAtLeast(0));lastRequest=System.currentTimeMillis()}
         currentCoroutineContext().ensureActive()
@@ -25,6 +26,7 @@ class PoolRepository(private val directory:File,private val request:((String,Boo
             val connection=java.util.concurrent.atomic.AtomicReference<java.net.HttpURLConnection?>()
             continuation.invokeOnCancellation{connection.get()?.disconnect()}
             try {
+                requestCount++
                 val text=if(request!=null)request.invoke(url,gbk)else market.get(url,gbk){opened->
                     connection.set(opened)
                     if(!continuation.isActive)throw CancellationException("扫描已暂停")
@@ -36,16 +38,16 @@ class PoolRepository(private val directory:File,private val request:((String,Boo
     override suspend fun universe():List<Stock> = withContext(Dispatchers.IO) {
         PoolUniverse.collect {page->PoolCodec.universePage(fetch("https://push2.eastmoney.com/api/qt/clist/get?pn=$page&pz=100&po=1&np=1&fltt=2&invt=2&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f12,f13,f14"))}
     }
-    private suspend fun history(symbol:String,date:LocalDate,provider:String):List<Bar> {
+    internal suspend fun history(symbol:String,date:LocalDate,provider:String,fresh:Boolean=false):List<Bar> {
         val source=if(provider=="腾讯公开行情")"tencent"else "eastmoney"
         val cache=File(directory,"$date-$source-$symbol.json")
         fun parse(text:String)=if(source=="tencent")MarketParser.daily(symbol,text)else MarketParser.eastDaily(symbol,text)
-        if(cache.isFile)return parse(cache.readText())
-        val text=if(source=="tencent")fetch("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=$symbol,day,,,120,qfq") else {
+        if(!fresh&&cache.isFile)return parse(cache.readText())
+        val text=if(source=="tencent")fetch("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=$symbol,day,,,${if(symbol in indexSymbols)320 else 120},qfq") else {
             val secid=(if(symbol.startsWith("sh"))"1."else "0.")+symbol.drop(2)
             fetch("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=$secid&klt=101&fqt=1&beg=20260101&end=20500101&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61")
         }
-        return parse(text).also{require(it.isNotEmpty()){"日线数据为空"};cache.writeText(text)}
+        return parse(text).also{require(it.isNotEmpty()){"日线数据为空"};if(!fresh)cache.writeText(text)}
     }
     override suspend fun basis():PoolBasis=withContext(Dispatchers.IO) {
         val text=fetch("https://qt.gtimg.cn/q=${indexSymbols.joinToString(",")}",true)
