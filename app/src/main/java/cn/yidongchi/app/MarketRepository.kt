@@ -12,7 +12,7 @@ import java.time.LocalDate
 class MarketRepository {
     private val historyCache=java.util.concurrent.ConcurrentHashMap<String,Pair<Long,List<Bar>>>()
     private val metadataCache=java.util.concurrent.ConcurrentHashMap<String,Stock>()
-    private fun get(url:String,gbk:Boolean=false):String {
+    internal fun get(url:String,gbk:Boolean=false):String {
         val conn=URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout=12_000;conn.readTimeout=15_000
         conn.setRequestProperty("User-Agent","Mozilla/5.0")

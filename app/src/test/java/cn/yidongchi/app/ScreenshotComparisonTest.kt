@@ -17,6 +17,8 @@ class ScreenshotComparisonTest {
             val s=snapshot(symbol)
             val result=Projection.project(s.quote.stock,s.bars,s.indexBars,Scenario(),1).first().analysis
             assertEquals(symbol,expected,result.levels.first {it.ruleId==rule&&it.direction==Direction.UP}.price.toPlainString())
+            val pool=TomorrowPool.calculate(s.quote.stock,s.bars,s.indexBars)
+            assertEquals(symbol,expected,pool.hits.first {it.level.ruleId==rule&&it.level.direction==Direction.UP}.level.price.toPlainString())
         }
     }
     @Test fun todayUsesYesterdayCloseAndDoesNotRollToTomorrowsWindow() {
