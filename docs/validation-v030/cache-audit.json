@@ -1,0 +1,13 @@
+{
+  "note": "Real cached history, synthetic next-day unchanged prices; not a live-market speed benchmark.",
+  "batchQuoteRequests": 56,
+  "syntheticDate": "2026-11-10",
+  "updateMillis": 21505,
+  "historyRepairs": 8,
+  "importMillis": 57577,
+  "importedSeries": 5226,
+  "inputDate": "2026-11-09",
+  "stocks": 5563,
+  "sameDayRepeatRequests": 1,
+  "network": false
+}
