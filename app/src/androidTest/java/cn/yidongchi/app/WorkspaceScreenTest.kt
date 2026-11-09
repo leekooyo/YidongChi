@@ -9,6 +9,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import org.junit.Assert.*
+import kotlinx.coroutines.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +46,25 @@ class WorkspaceScreenTest {
         ui.onNodeWithText("预警").performClick()
         ui.onNodeWithTag("stock-search-warnings").assertExists()
         ui.onNodeWithText("全部自选").assertExists()
+    }
+    @Test fun cancelledEventLoadRestoresItsOwnStatus() {
+        val state=ready()
+        val cardScope=CoroutineScope(Job()+Dispatchers.Main.immediate)
+        var pending:Job?=null
+        try {
+            ui.runOnIdle {
+                state.snapshots["sz002086"]=snapshot("sz002086","事件取消样本")
+                state.eventStatuses["sz002086"]="已有记录"
+                state.eventStatuses["sz002242"]="另一股票状态"
+                pending=cardScope.launch(start=CoroutineStart.UNDISPATCHED){state.loadEvents("sz002086")}
+                cardScope.cancel()
+            }
+            ui.waitUntil(40_000){pending!!.isCompleted}
+            ui.runOnIdle {
+                assertEquals("已有记录",state.eventStatuses["sz002086"])
+                assertEquals("另一股票状态",state.eventStatuses["sz002242"])
+            }
+        }finally{cardScope.cancel()}
     }
     @Test fun threePagesKeepDifferentStocksAndForecastInputsWhilePoolOnlyChangesCalculation() {
         val state=ready()

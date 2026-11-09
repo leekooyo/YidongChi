@@ -130,10 +130,11 @@ class AppState(app:Application):AndroidViewModel(app) {
     suspend fun loadEvents(symbol:String=selected) {
         val s=snapshots[symbol]?:return
         if(!eventsLoading.add(symbol))return
+        val previousStatus=eventStatuses[symbol]?:"尚未加载记录"
         eventStatuses[symbol]="正在读取行情源记录"
         try {val incoming=repository.eventCandidates(s.quote.stock);events=EventLogic.merge(events,incoming);store.saveEvents(events);eventsFetched+="$symbol-${s.quote.time.toLocalDate()}";eventStatuses[symbol]="行情源候选记录已读取；不代表官方事件完整覆盖"
             if(store.value("alert-event","true")=="true"&&watches.firstOrNull{it.symbol==symbol}?.muted!=true){val hits=s.recent(events).filter {it.confirmed&&it.kind!="normal"}.map {AlertItem("event-${it.symbol}-${it.date}-${it.kind}",symbol,"${s.quote.stock.name} 存在近期已确认严重异动记录 ${it.date}",it.date)};alerts=Watchlist.mergeAlerts(alerts,hits)}
-        }catch(e:Exception){if(e is CancellationException)throw e;eventStatuses[symbol]="事件源暂不可用；未读取到不能视为没有异动"}
+        }catch(e:Exception){if(e is CancellationException){eventStatuses[symbol]=previousStatus;throw e};eventStatuses[symbol]="事件源暂不可用；未读取到不能视为没有异动"}
         finally{eventsLoading.remove(symbol)}
     }
     fun addEvent(date:String,kind:String,direction:Direction,url:String,symbol:String=workspaces.warnings.symbol) {val d=LocalDate.parse(date);require(url.startsWith("https://")){"请填写原公告 HTTPS 链接"};events=events.filterNot {it.symbol==symbol&&it.date==d&&it.kind==kind}+OfficialEvent("$symbol-$d-$kind",symbol,d,kind,direction,url,true);store.saveEvents(events);message="已按你核对的原公告保存"}
