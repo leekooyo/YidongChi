@@ -52,7 +52,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
         var intro by remember {mutableStateOf(state.store.value("intro")!="done")}
         val snackbar=remember {SnackbarHostState()}
         val owner=LocalLifecycleOwner.current
-        DisposableEffect(owner){val observer=LifecycleEventObserver {_,e->if(e==Lifecycle.Event.ON_START)state.active=true else if(e==Lifecycle.Event.ON_STOP)state.active=false};owner.lifecycle.addObserver(observer);onDispose{owner.lifecycle.removeObserver(observer)}}
+        DisposableEffect(owner){val observer=LifecycleEventObserver {_,e->if(e==Lifecycle.Event.ON_START)state.active=true else if(e==Lifecycle.Event.ON_STOP){state.active=false;state.pausePool()}};owner.lifecycle.addObserver(observer);onDispose{owner.lifecycle.removeObserver(observer)}}
         LaunchedEffect(state.active){while(state.active){val now=LocalDateTime.now(ZoneId.of("Asia/Shanghai"));if(TradingCalendar.isTradingDay(now.toLocalDate())&&now.hour in 9..15)state.refresh();delay(15_000)}}
         LaunchedEffect(state.message){if(state.message.isNotBlank()){snackbar.showSnackbar(state.message);state.message=""}}
         Scaffold(topBar={Column(Modifier.statusBarsPadding().padding(horizontal=20.dp,vertical=12.dp)) {
@@ -65,7 +65,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
             labels.forEachIndexed {i,s->NavigationBarItem(selected=page==i,onClick={page=i},icon={Icon(icons[i],s)},label={Text(s)})}
         }}) {padding->
             PullToRefreshBox(isRefreshing=state.busy,onRefresh={state.refreshNow()},modifier=Modifier.fillMaxSize().padding(padding)) {when(page){
-                0->WatchScreen(state,onOpen={state.select(it);page=1})
+                0->WatchHome(state,onOpen={state.select(it);page=1},onPoolOpen={state.openPoolStock(it);page=1})
                 1->CalculationScreen(state)
                 2->ForecastScreen(state)
                 3->EventsScreen(state)

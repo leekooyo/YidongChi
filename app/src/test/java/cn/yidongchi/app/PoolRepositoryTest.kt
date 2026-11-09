@@ -40,4 +40,28 @@ class PoolRepositoryTest {
         val batch=PoolBatch(basis,listOf(stock))
         repo.save(batch);assertEquals(batch,again.cached())
     }
+    @Test fun blockedPrimaryUsesPairedAlternateHistoryAndKeepsSource()=runBlocking {
+        val directory=Files.createTempDirectory("yidong-pool-fallback").toFile()
+        var alternateCalls=0
+        val primary=PoolRepository(directory){url,_->
+            if(url.contains("qt.gtimg.cn"))text("sz002086","-quote.txt")
+            else if(url.contains("fqkline"))error("HTTP 501 WAF")
+            else {
+                alternateCalls++
+                val symbol=url.substringAfter("secid=").substringBefore('&').substringAfter('.')
+                val source=if(symbol=="002086")"sz002086"else "sz399107"
+                val data=org.json.JSONObject(text(source,"-daily.json")).getJSONObject("data").getJSONObject(source)
+                val raw=data.optJSONArray("qfqday")?:data.getJSONArray("day")
+                val lines=(0 until raw.length()).map{i->val a=raw.getJSONArray(i);listOf(a.getString(0),a.getString(1),a.getString(2),a.getString(3),a.getString(4),"1","1","1","1","1","1").joinToString(",")}
+                org.json.JSONObject().put("data",org.json.JSONObject().put("klines",org.json.JSONArray(lines))).toString()
+            }
+        }
+        val symbol="sz002086";val q=MarketParser.quote(symbol,text(symbol,"-quote.txt"))
+        val ix=MarketParser.withQuote(MarketParser.daily("sz399107",text("sz399107","-daily.json")),MarketParser.quote("sz399107",text("sz399107","-quote.txt")),true)
+        val basis=PoolBasis(q.time,listOf("sh000002","sz399107","sh000688","sz399102").associateWith{ix})
+        val result=primary.load(q.stock,basis)
+        assertTrue(result.provider.contains("东方财富"))
+        assertEquals(5,alternateCalls)
+        assertEquals("4.64",TomorrowPool.calculate(result.quote.stock,result.bars,result.indexBars).hits.first{it.level.ruleId=="severe10"&&it.level.direction==Direction.UP}.level.price.toPlainString())
+    }
 }

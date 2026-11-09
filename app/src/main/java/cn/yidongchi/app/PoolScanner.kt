@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 data class UniversePage(val total:Int,val stocks:List<Stock>)
 data class PoolBasis(val time:LocalDateTime,val indices:Map<String,List<Bar>>,val provider:String="腾讯公开行情")
-data class PoolOutcome(val result:PoolStock?=null,val issue:String?=null,val excluded:Boolean=false)
+data class PoolOutcome(val result:PoolStock?=null,val issue:String?=null,val excluded:Boolean=false,val provider:String?=null)
 data class PoolBatch(val basis:PoolBasis,val universe:List<Stock>,val outcomes:Map<String,PoolOutcome> = emptyMap()) {
     val processed get()=outcomes.size
     val failures get()=outcomes.filterValues{it.issue!=null&&!it.excluded}
@@ -55,7 +55,7 @@ class PoolScanner(private val source:PoolSource) {
                     require(snapshot.quote.time.toLocalDate()==initial.basis.time.toLocalDate()){"行情日期与扫描基准不一致"}
                     val result=TomorrowPool.calculate(snapshot.quote.stock,snapshot.bars,snapshot.indexBars,resets(stock.symbol))
                     if(result.excludedReason!=null)PoolOutcome(issue=result.excludedReason,excluded=true)
-                    else PoolOutcome(result=result.takeIf{it.hits.isNotEmpty()})
+                    else PoolOutcome(result=result.takeIf{it.hits.isNotEmpty()},provider=snapshot.provider)
                 } catch(e:CancellationException){throw e}
                 catch(e:PoolExcluded){PoolOutcome(issue=e.message,excluded=true)}
                 catch(e:Exception){PoolOutcome(issue=e.message?:"数据读取失败")}

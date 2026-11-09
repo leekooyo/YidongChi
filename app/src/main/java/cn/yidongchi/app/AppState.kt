@@ -33,10 +33,51 @@ class AppState(app:Application):AndroidViewModel(app) {
     var filter by mutableStateOf("全部")
     var history by mutableStateOf(store.value("recent").split('|').filter {it.isNotBlank()});private set
     var active by mutableStateOf(true)
+    private val poolRepository=PoolRepository(java.io.File(app.filesDir,"pool"))
+    var poolBatch by mutableStateOf<PoolBatch?>(null)
+    var poolRunning by mutableStateOf(false);private set
+    var poolLoading by mutableStateOf(true);private set
+    var poolError by mutableStateOf("");private set
+    var calculationRequest by mutableIntStateOf(0);private set
+    private var poolJob:Job?=null
     private val loading=mutableSetOf<String>()
     private val eventsFetched=mutableSetOf<String>()
     private var searchJob:Job?=null
-    init {store.cached(selected)?.let {snapshots[selected]=it};viewModelScope.launch {refresh()}}
+    init {
+        store.cached(selected)?.let {snapshots[selected]=it};viewModelScope.launch {refresh()}
+        viewModelScope.launch {try{poolBatch=withContext(Dispatchers.IO){poolRepository.cached()}}catch(e:Exception){if(e is CancellationException)throw e;poolError="上次扫描记录无法读取，请重新扫描"}finally{poolLoading=false}}
+    }
+    fun startPool(newBatch:Boolean=false,retry:Boolean=false) {
+        if(poolRunning||poolLoading)return
+        poolRunning=true;poolError=""
+        poolJob=viewModelScope.launch {
+            try {
+                val basis=poolRepository.basis()
+                val old=poolBatch
+                val initial=if(!newBatch&&old?.basis?.time?.toLocalDate()==basis.time.toLocalDate()) {
+                    if(retry)old.retryFailures()else old
+                }else PoolBatch(basis,poolRepository.universe())
+                poolBatch=initial
+                withContext(Dispatchers.IO){poolRepository.save(initial)}
+                PoolScanner(poolRepository).scan(initial,::resets) {batch->
+                    poolBatch=batch
+                    if(batch.processed%20==0)withContext(Dispatchers.IO){poolRepository.save(batch)}
+                }
+            }catch(e:CancellationException){throw e}
+            catch(e:Exception){poolError=e.message?:"扫描失败，请重试"}
+            finally {
+                withContext(NonCancellable) {
+                    try{poolBatch?.let{batch->withContext(Dispatchers.IO){poolRepository.save(batch)}}}
+                    catch(e:Exception){poolError="扫描记录保存失败：${e.message}"}
+                    poolRunning=false
+                }
+            }
+        }
+    }
+    fun pausePool(){poolJob?.cancel()}
+    fun openPoolStock(symbol:String) {
+        store.put("index-$symbol","0");calculationRequest++;select(symbol)
+    }
     fun setting(key:String,value:String) {store.put(key,value);when(key){"theme"->theme=value;"large"->large=value=="true";"threshold"->threshold=value}}
     fun select(symbol:String) {
         selected=symbol;store.put("selected",symbol)

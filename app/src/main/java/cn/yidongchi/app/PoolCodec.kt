@@ -35,7 +35,7 @@ object PoolCodec {
         val indices=JSONObject();batch.basis.indices.forEach{(s,b)->indices.put(s,JSONArray(b.map{bar(it)}))}
         val results=JSONObject()
         batch.outcomes.forEach{(s,o)->
-            val j=JSONObject().put("issue",o.issue).put("excluded",o.excluded)
+            val j=JSONObject().put("issue",o.issue).put("excluded",o.excluded).put("provider",o.provider)
             o.result?.let{r->j.put("result",JSONObject().put("stock",stock(r.stock)).put("target",r.targetDate).put("price",r.price.toPlainString()).put("hits",JSONArray(r.hits.map{hit(it)})))}
             results.put(s,j)
         }
@@ -47,7 +47,7 @@ object PoolCodec {
         val universe=j.getJSONArray("universe").let{a->(0 until a.length()).map{stock(a.getJSONObject(it))}}
         val outcomes=j.getJSONObject("outcomes").let{all->all.keys().asSequence().associateWith{s->
             val o=all.getJSONObject(s);val r=o.optJSONObject("result")
-            PoolOutcome(r?.let{val a=it.getJSONArray("hits");PoolStock(stock(it.getJSONObject("stock")),LocalDate.parse(it.getString("target")),it.getString("price").bd(),(0 until a.length()).map{n->hit(a.getJSONObject(n))})},o.optString("issue").takeIf{it.isNotBlank()},o.optBoolean("excluded"))
+            PoolOutcome(r?.let{val a=it.getJSONArray("hits");PoolStock(stock(it.getJSONObject("stock")),LocalDate.parse(it.getString("target")),it.getString("price").bd(),(0 until a.length()).map{n->hit(a.getJSONObject(n))})},o.optString("issue").takeIf{it.isNotBlank()},o.optBoolean("excluded"),o.optString("provider").takeIf{it.isNotBlank()})
         }}
         return PoolBatch(PoolBasis(LocalDateTime.parse(j.getString("time")),indices,j.getString("provider")),universe,outcomes)
     }
