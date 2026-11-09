@@ -53,7 +53,8 @@ class PoolScanner(private val source:PoolSource) {
                 val outcome=try {
                     val snapshot=source.load(stock,initial.basis)
                     require(snapshot.quote.time.toLocalDate()==initial.basis.time.toLocalDate()){"行情日期与扫描基准不一致"}
-                    val result=TomorrowPool.calculate(snapshot.quote.stock,snapshot.bars,snapshot.indexBars,resets(stock.symbol))
+                    val reset=resets(stock.symbol)
+                    val result=withContext(Dispatchers.Default){TomorrowPool.calculate(snapshot.quote.stock,snapshot.bars,snapshot.indexBars,reset)}
                     if(result.excludedReason!=null)PoolOutcome(issue=result.excludedReason,excluded=true)
                     else PoolOutcome(result=result.takeIf{it.hits.isNotEmpty()},provider=snapshot.provider)
                 } catch(e:CancellationException){throw e}

@@ -1,0 +1,143 @@
+JUnit version 4.13.2
+.UNIVERSE 5563 DATE 2026-11-09T16:14:51
+PROGRESS 50/5563 hits=0 failed=0 excluded=1 elapsed=7s
+PROGRESS 100/5563 hits=0 failed=0 excluded=1 elapsed=9s
+PROGRESS 150/5563 hits=1 failed=0 excluded=1 elapsed=12s
+PROGRESS 200/5563 hits=1 failed=0 excluded=2 elapsed=15s
+PROGRESS 250/5563 hits=1 failed=0 excluded=3 elapsed=17s
+PROGRESS 300/5563 hits=1 failed=0 excluded=3 elapsed=20s
+PROGRESS 350/5563 hits=1 failed=0 excluded=3 elapsed=23s
+PROGRESS 400/5563 hits=1 failed=0 excluded=4 elapsed=25s
+PROGRESS 450/5563 hits=1 failed=0 excluded=4 elapsed=28s
+PROGRESS 500/5563 hits=1 failed=0 excluded=4 elapsed=31s
+PROGRESS 550/5563 hits=1 failed=0 excluded=6 elapsed=33s
+PROGRESS 600/5563 hits=1 failed=0 excluded=6 elapsed=36s
+PROGRESS 650/5563 hits=1 failed=0 excluded=6 elapsed=39s
+PROGRESS 700/5563 hits=1 failed=0 excluded=6 elapsed=41s
+PROGRESS 750/5563 hits=1 failed=0 excluded=8 elapsed=44s
+PROGRESS 800/5563 hits=1 failed=0 excluded=9 elapsed=47s
+PROGRESS 850/5563 hits=1 failed=0 excluded=9 elapsed=50s
+PROGRESS 900/5563 hits=1 failed=0 excluded=9 elapsed=52s
+PROGRESS 950/5563 hits=1 failed=0 excluded=9 elapsed=55s
+PROGRESS 1000/5563 hits=1 failed=0 excluded=11 elapsed=58s
+PROGRESS 1050/5563 hits=1 failed=0 excluded=12 elapsed=60s
+PROGRESS 1100/5563 hits=1 failed=0 excluded=12 elapsed=63s
+PROGRESS 1150/5563 hits=1 failed=0 excluded=12 elapsed=66s
+PROGRESS 1200/5563 hits=1 failed=0 excluded=12 elapsed=68s
+PROGRESS 1250/5563 hits=1 failed=0 excluded=14 elapsed=71s
+PROGRESS 1300/5563 hits=1 failed=0 excluded=14 elapsed=73s
+PROGRESS 1350/5563 hits=1 failed=0 excluded=15 elapsed=76s
+PROGRESS 1400/5563 hits=1 failed=0 excluded=17 elapsed=79s
+PROGRESS 1450/5563 hits=1 failed=0 excluded=17 elapsed=81s
+PROGRESS 1500/5563 hits=1 failed=0 excluded=20 elapsed=84s
+PROGRESS 1550/5563 hits=1 failed=0 excluded=22 elapsed=86s
+PROGRESS 1600/5563 hits=1 failed=0 excluded=25 elapsed=89s
+PROGRESS 1650/5563 hits=1 failed=0 excluded=26 elapsed=91s
+PROGRESS 1700/5563 hits=1 failed=0 excluded=34 elapsed=93s
+PROGRESS 1750/5563 hits=1 failed=1 excluded=45 elapsed=96s
+PROGRESS 1800/5563 hits=1 failed=1 excluded=53 elapsed=98s
+PROGRESS 1850/5563 hits=1 failed=1 excluded=58 elapsed=101s
+PROGRESS 1900/5563 hits=1 failed=1 excluded=70 elapsed=103s
+PROGRESS 1950/5563 hits=1 failed=1 excluded=82 elapsed=105s
+PROGRESS 2000/5563 hits=1 failed=1 excluded=87 elapsed=108s
+PROGRESS 2050/5563 hits=1 failed=1 excluded=88 elapsed=110s
+PROGRESS 2100/5563 hits=1 failed=1 excluded=94 elapsed=113s
+PROGRESS 2150/5563 hits=1 failed=1 excluded=99 elapsed=115s
+PROGRESS 2200/5563 hits=1 failed=1 excluded=104 elapsed=118s
+PROGRESS 2250/5563 hits=1 failed=1 excluded=117 elapsed=120s
+PROGRESS 2300/5563 hits=1 failed=1 excluded=126 elapsed=122s
+PROGRESS 2350/5563 hits=1 failed=1 excluded=131 elapsed=125s
+PROGRESS 2400/5563 hits=1 failed=1 excluded=141 elapsed=127s
+PROGRESS 2450/5563 hits=1 failed=1 excluded=147 elapsed=129s
+PROGRESS 2500/5563 hits=2 failed=1 excluded=151 elapsed=132s
+PROGRESS 2550/5563 hits=2 failed=1 excluded=151 elapsed=135s
+PROGRESS 2600/5563 hits=2 failed=1 excluded=151 elapsed=137s
+PROGRESS 2650/5563 hits=2 failed=1 excluded=151 elapsed=140s
+PROGRESS 2700/5563 hits=3 failed=1 excluded=151 elapsed=143s
+PROGRESS 2750/5563 hits=3 failed=1 excluded=151 elapsed=145s
+PROGRESS 2800/5563 hits=3 failed=1 excluded=151 elapsed=148s
+PROGRESS 2850/5563 hits=3 failed=1 excluded=152 elapsed=150s
+PROGRESS 2900/5563 hits=3 failed=1 excluded=152 elapsed=153s
+PROGRESS 2950/5563 hits=3 failed=1 excluded=152 elapsed=156s
+PROGRESS 3000/5563 hits=4 failed=1 excluded=152 elapsed=159s
+PROGRESS 3050/5563 hits=4 failed=1 excluded=152 elapsed=162s
+PROGRESS 3100/5563 hits=4 failed=1 excluded=152 elapsed=164s
+PROGRESS 3150/5563 hits=4 failed=1 excluded=153 elapsed=167s
+PROGRESS 3200/5563 hits=4 failed=1 excluded=154 elapsed=169s
+PROGRESS 3250/5563 hits=4 failed=1 excluded=154 elapsed=172s
+PROGRESS 3300/5563 hits=4 failed=1 excluded=155 elapsed=175s
+PROGRESS 3350/5563 hits=4 failed=1 excluded=155 elapsed=177s
+PROGRESS 3400/5563 hits=4 failed=1 excluded=156 elapsed=180s
+PROGRESS 3450/5563 hits=4 failed=1 excluded=157 elapsed=182s
+PROGRESS 3500/5563 hits=4 failed=1 excluded=158 elapsed=185s
+PROGRESS 3550/5563 hits=4 failed=1 excluded=161 elapsed=187s
+PROGRESS 3600/5563 hits=4 failed=1 excluded=169 elapsed=190s
+PROGRESS 3650/5563 hits=4 failed=1 excluded=175 elapsed=192s
+PROGRESS 3700/5563 hits=4 failed=1 excluded=176 elapsed=195s
+PROGRESS 3750/5563 hits=4 failed=1 excluded=181 elapsed=197s
+PROGRESS 3800/5563 hits=4 failed=1 excluded=182 elapsed=200s
+PROGRESS 3850/5563 hits=4 failed=1 excluded=188 elapsed=202s
+PROGRESS 3900/5563 hits=4 failed=1 excluded=193 elapsed=204s
+PROGRESS 3950/5563 hits=4 failed=1 excluded=193 elapsed=207s
+PROGRESS 4000/5563 hits=4 failed=2 excluded=193 elapsed=209s
+PROGRESS 4050/5563 hits=4 failed=3 excluded=193 elapsed=212s
+PROGRESS 4100/5563 hits=4 failed=13 excluded=194 elapsed=214s
+PROGRESS 4150/5563 hits=4 failed=36 excluded=195 elapsed=217s
+PROGRESS 4200/5563 hits=4 failed=68 excluded=200 elapsed=219s
+PROGRESS 4250/5563 hits=4 failed=112 excluded=204 elapsed=221s
+PROGRESS 4300/5563 hits=4 failed=159 excluded=207 elapsed=223s
+PROGRESS 4350/5563 hits=4 failed=203 excluded=213 elapsed=226s
+PROGRESS 4400/5563 hits=4 failed=253 excluded=213 elapsed=228s
+PROGRESS 4450/5563 hits=4 failed=297 excluded=219 elapsed=230s
+PROGRESS 4500/5563 hits=4 failed=342 excluded=224 elapsed=232s
+PROGRESS 4550/5563 hits=4 failed=388 excluded=228 elapsed=235s
+PROGRESS 4600/5563 hits=4 failed=436 excluded=230 elapsed=237s
+PROGRESS 4650/5563 hits=4 failed=482 excluded=234 elapsed=239s
+PROGRESS 4700/5563 hits=4 failed=530 excluded=236 elapsed=241s
+PROGRESS 4750/5563 hits=4 failed=578 excluded=238 elapsed=244s
+PROGRESS 4800/5563 hits=4 failed=626 excluded=240 elapsed=246s
+PROGRESS 4850/5563 hits=4 failed=671 excluded=245 elapsed=248s
+PROGRESS 4900/5563 hits=4 failed=719 excluded=247 elapsed=250s
+PROGRESS 4950/5563 hits=4 failed=766 excluded=250 elapsed=252s
+PROGRESS 5000/5563 hits=4 failed=816 excluded=250 elapsed=255s
+PROGRESS 5050/5563 hits=4 failed=866 excluded=250 elapsed=257s
+PROGRESS 5100/5563 hits=4 failed=909 excluded=257 elapsed=259s
+PROGRESS 5150/5563 hits=4 failed=956 excluded=260 elapsed=262s
+PROGRESS 5200/5563 hits=4 failed=996 excluded=270 elapsed=264s
+PROGRESS 5250/5563 hits=4 failed=1038 excluded=278 elapsed=266s
+PROGRESS 5300/5563 hits=4 failed=1082 excluded=284 elapsed=268s
+PROGRESS 5350/5563 hits=4 failed=1115 excluded=301 elapsed=270s
+PROGRESS 5400/5563 hits=4 failed=1153 excluded=313 elapsed=272s
+PROGRESS 5450/5563 hits=4 failed=1194 excluded=322 elapsed=274s
+PROGRESS 5500/5563 hits=4 failed=1236 excluded=330 elapsed=276s
+PROGRESS 5550/5563 hits=4 failed=1275 excluded=341 elapsed=278s
+PROGRESS 5563/5563 hits=4 failed=1285 excluded=344 elapsed=279s
+RESULT total=5563, processed=5563, failures=1285, excluded=344, hitStocks=4, elapsedSeconds=279
+E
+Time: 279.615
+There was 1 failure:
+1) scanAllShanghaiAndShenzhenStocks(cn.yidongchi.app.PoolLiveScanTest)
+java.lang.AssertionError: ��������ʧ�ܣ���Ҫ��ȷ���沢���� expected:<0> but was:<1285>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at cn.yidongchi.app.PoolLiveScanTest$scanAllShanghaiAndShenzhenStocks$1.invokeSuspend(PoolLiveScanTest.kt:35)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at cn.yidongchi.app.PoolLiveScanTest.scanAllShanghaiAndShenzhenStocks(PoolLiveScanTest.kt:12)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+

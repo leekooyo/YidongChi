@@ -1,0 +1,58 @@
+JUnit version 4.13.2
+.UNIVERSE 5563 DATE 2026-11-09T16:14:51
+PROGRESS 4300/5563 hits=4 failed=1 excluded=344 elapsed=8s
+PROGRESS 4350/5563 hits=4 failed=1 excluded=344 elapsed=19s
+PROGRESS 4400/5563 hits=4 failed=1 excluded=345 elapsed=29s
+PROGRESS 4450/5563 hits=4 failed=1 excluded=345 elapsed=39s
+PROGRESS 4500/5563 hits=4 failed=1 excluded=345 elapsed=51s
+PROGRESS 4550/5563 hits=4 failed=1 excluded=345 elapsed=62s
+PROGRESS 4600/5563 hits=4 failed=1 excluded=345 elapsed=74s
+PROGRESS 4650/5563 hits=4 failed=1 excluded=345 elapsed=84s
+PROGRESS 4700/5563 hits=4 failed=1 excluded=345 elapsed=94s
+PROGRESS 4750/5563 hits=4 failed=1 excluded=345 elapsed=105s
+PROGRESS 4800/5563 hits=4 failed=1 excluded=345 elapsed=116s
+PROGRESS 4850/5563 hits=5 failed=1 excluded=345 elapsed=126s
+PROGRESS 4900/5563 hits=5 failed=1 excluded=345 elapsed=137s
+PROGRESS 4950/5563 hits=6 failed=1 excluded=345 elapsed=148s
+PROGRESS 5000/5563 hits=6 failed=1 excluded=345 elapsed=158s
+PROGRESS 5050/5563 hits=6 failed=1 excluded=346 elapsed=170s
+PROGRESS 5100/5563 hits=6 failed=1 excluded=346 elapsed=180s
+PROGRESS 5150/5563 hits=6 failed=1 excluded=346 elapsed=191s
+PROGRESS 5200/5563 hits=6 failed=1 excluded=346 elapsed=202s
+PROGRESS 5250/5563 hits=6 failed=1 excluded=346 elapsed=212s
+PROGRESS 5300/5563 hits=6 failed=1 excluded=346 elapsed=222s
+PROGRESS 5350/5563 hits=6 failed=1 excluded=346 elapsed=233s
+PROGRESS 5400/5563 hits=6 failed=1 excluded=346 elapsed=243s
+PROGRESS 5450/5563 hits=6 failed=1 excluded=346 elapsed=253s
+PROGRESS 5500/5563 hits=6 failed=1 excluded=346 elapsed=263s
+PROGRESS 5550/5563 hits=6 failed=1 excluded=346 elapsed=274s
+PROGRESS 5563/5563 hits=6 failed=1 excluded=346 elapsed=276s
+RESULT total=5563, processed=5563, failures=1, excluded=346, hitStocks=6, elapsedSeconds=276
+E
+Time: 276.886
+There was 1 failure:
+1) scanAllShanghaiAndShenzhenStocks(cn.yidongchi.app.PoolLiveScanTest)
+java.lang.AssertionError: ��������ʧ�ܣ���Ҫ��ȷ���沢���� expected:<0> but was:<1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at cn.yidongchi.app.PoolLiveScanTest$scanAllShanghaiAndShenzhenStocks$1.invokeSuspend(PoolLiveScanTest.kt:35)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source)
+	at cn.yidongchi.app.PoolLiveScanTest.scanAllShanghaiAndShenzhenStocks(PoolLiveScanTest.kt:12)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+

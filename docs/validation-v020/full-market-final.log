@@ -1,0 +1,9 @@
+JUnit version 4.13.2
+.UNIVERSE 5563 DATE 2026-11-09T16:14:51
+PROGRESS 5563/5563 hits=6 failed=0 excluded=347 elapsed=1s
+RESULT total=5563, processed=5563, failures=0, excluded=347, hitStocks=6, elapsedSeconds=1
+
+Time: 1.358
+
+OK (1 test)
+

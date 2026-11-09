@@ -1,13 +1,49 @@
 package cn.yidongchi.app
 
 import cn.yidongchi.core.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.Assert.*
 import org.junit.Test
 import java.nio.file.Files
 
 class PoolRepositoryTest {
     private fun text(s:String,suffix:String)=javaClass.getResource("/comparison-20261109/$s$suffix")!!.readText()
+    @Test fun pauseDuringBlockingFailureDoesNotStartAnAlternateRequest()=runBlocking {
+        lateinit var loading:Job
+        var calls=0
+        val repo=PoolRepository(Files.createTempDirectory("yidong-cancel").toFile()){url,_->
+            if(url.contains("qt.gtimg.cn"))text("sz002086","-quote.txt")else {
+                calls++
+                if(url.contains("fqkline")){Thread.sleep(150);loading.cancel();error("阻塞请求结束时已暂停")}
+                org.json.JSONObject().put("data",org.json.JSONObject().put("klines",org.json.JSONArray(listOf("2026-11-06,1,1,1,1,1,1,1,1,1,1","2026-11-09,1,1,1,1,1,1,1,1,1,1")))).toString()
+            }
+        }
+        val s=MarketParser.quote("sz002086",text("sz002086","-quote.txt"))
+        val ix=MarketParser.daily("sz399107",text("sz399107","-daily.json"))
+        val basis=PoolBasis(s.time,listOf("sh000002","sz399107","sh000688","sz399102").associateWith{ix})
+        loading=launch {repo.load(s.stock,basis)}
+        loading.join()
+        assertEquals("暂停后不得继续切备用源发请求",1,calls)
+    }
+    @Test fun verifiedObsoleteConversionCodeIsExcludedInsteadOfRetried()=runBlocking {
+        val repo=PoolRepository(Files.createTempDirectory("yidong-legacy").toFile()){_,_->error("不应为历史转换代码请求行情")}
+        val basis=PoolBasis(java.time.LocalDateTime.parse("2026-11-09T15:00:00"),emptyMap())
+        try{repo.load(Stock("sh600849","上药转换",Board.SH_MAIN),basis);fail("应明确排除历史转换代码")}
+        catch(e:PoolExcluded){assertTrue(e.message!!.contains("601607"))}
+    }
+    @Test fun oldDailyCacheIsPrunedButResumableBatchDateIsPreserved() {
+        val directory=Files.createTempDirectory("yidong-retention").toFile()
+        val repo=PoolRepository(directory){_,_->error("无需联网")}
+        java.io.File(directory,"2026-01-01-tencent-sz002086.json").writeText("old")
+        java.io.File(directory,"2026-01-02-tencent-sz002086.json").writeText("resume")
+        java.io.File(directory,"2026-11-09-tencent-sz002086.json").writeText("current")
+        val batch=PoolBatch(PoolBasis(java.time.LocalDateTime.parse("2026-01-02T15:00:00"),emptyMap()),emptyList())
+        repo.save(batch)
+        repo.prune(java.time.LocalDate.parse("2026-11-09"))
+        assertFalse(java.io.File(directory,"2026-01-01-tencent-sz002086.json").exists())
+        assertTrue(java.io.File(directory,"2026-01-02-tencent-sz002086.json").isFile)
+        assertTrue(java.io.File(directory,"2026-11-09-tencent-sz002086.json").isFile)
+    }
     @Test fun indexHistoryIsSharedAndStockHistorySurvivesRepositoryRecreation()=runBlocking {
         val directory=Files.createTempDirectory("yidong-pool-test").toFile()
         val calls=mutableListOf<String>()

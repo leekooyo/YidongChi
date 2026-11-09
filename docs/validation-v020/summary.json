@@ -1,0 +1,285 @@
+{
+  "version": "0.2.0",
+  "basis": "2026-11-09T16:14:51",
+  "universeRecords": 5563,
+  "processed": 5563,
+  "failures": 0,
+  "exclusions": {
+    "停牌或当日无成交": 344,
+    "无涨跌幅限制或资格未确认": 1,
+    "特殊交易阶段": 1,
+    "历史转换代码，现证券代码为601607": 1
+  },
+  "hits": [
+    {
+      "symbol": "sh688613",
+      "hits": [
+        {
+          "sessions": 7,
+          "satisfied": true,
+          "start": "2026-11-02",
+          "rule": "severe10",
+          "deviation": "-0.6186422968318537194448640882482643",
+          "threshold": "-0.50",
+          "label": "10日严重异动",
+          "reachable": true,
+          "required": "0",
+          "indexStart": "1160.840",
+          "price": "9.91",
+          "end": "2026-11-10",
+          "indexEnd": "1256.9600",
+          "theory": "9.919291892078150304951586781985459",
+          "direction": "DOWN",
+          "base": "17.02"
+        },
+        {
+          "sessions": 7,
+          "satisfied": false,
+          "start": "2026-11-02",
+          "rule": "severe30",
+          "deviation": "-0.6186422968318537194448640882482643",
+          "threshold": "-0.70",
+          "label": "30日严重异动",
+          "reachable": true,
+          "required": "-0.1759493670886075949367088607594937",
+          "indexStart": "1160.840",
+          "price": "6.51",
+          "end": "2026-11-10",
+          "indexEnd": "1256.9600",
+          "theory": "6.515291892078150304951586781985459",
+          "direction": "DOWN",
+          "base": "17.02"
+        }
+      ],
+      "price": "7.90",
+      "stock": {
+        "excluded": false,
+        "symbol": "sh688613",
+        "name": "奥精医疗"
+      },
+      "target": "2026-11-10"
+    },
+    {
+      "symbol": "sz002242",
+      "hits": [
+        {
+          "sessions": 27,
+          "satisfied": false,
+          "start": "2026-09-28",
+          "rule": "severe30",
+          "deviation": "1.917837243365507136907584657310636",
+          "threshold": "2",
+          "label": "30日严重异动",
+          "reachable": true,
+          "required": "0.02988505747126436781609195402298851",
+          "indexStart": "2590.89",
+          "price": "26.88",
+          "end": "2026-11-10",
+          "indexEnd": "2232.6100",
+          "theory": "26.87150828479788798443778006785313",
+          "direction": "UP",
+          "base": "9.39"
+        }
+      ],
+      "price": "26.10",
+      "stock": {
+        "excluded": false,
+        "symbol": "sz002242",
+        "name": "九阳股份"
+      },
+      "target": "2026-11-10"
+    },
+    {
+      "symbol": "sz002086",
+      "hits": [
+        {
+          "sessions": 9,
+          "satisfied": false,
+          "start": "2026-10-29",
+          "rule": "severe10",
+          "deviation": "0.8860378507963056458921902293203503",
+          "threshold": "1",
+          "label": "10日严重异动",
+          "reachable": true,
+          "required": "0.06178489702517162471395881006864989",
+          "indexStart": "2274.73",
+          "price": "4.64",
+          "end": "2026-11-10",
+          "indexEnd": "2232.6100",
+          "theory": "4.636671429136644788612274863390380",
+          "direction": "UP",
+          "base": "2.34"
+        }
+      ],
+      "price": "4.37",
+      "stock": {
+        "excluded": false,
+        "symbol": "sz002086",
+        "name": "东方海洋"
+      },
+      "target": "2026-11-10"
+    },
+    {
+      "symbol": "sz301697",
+      "hits": [
+        {
+          "sessions": 7,
+          "satisfied": false,
+          "start": "2026-11-02",
+          "rule": "severe10",
+          "deviation": "0.6899146267989386209957686765182650",
+          "threshold": "1",
+          "label": "10日严重异动",
+          "reachable": true,
+          "required": "0.1797945205479452054794520547945205",
+          "indexStart": "3080.090",
+          "price": "41.34",
+          "end": "2026-11-10",
+          "indexEnd": "3191.5700",
+          "theory": "41.33473307598154599378589586667922",
+          "direction": "UP",
+          "base": "20.3"
+        }
+      ],
+      "price": "35.04",
+      "stock": {
+        "excluded": false,
+        "symbol": "sz301697",
+        "name": "贝特利"
+      },
+      "target": "2026-11-10"
+    },
+    {
+      "symbol": "sz301313",
+      "hits": [
+        {
+          "sessions": 23,
+          "satisfied": false,
+          "start": "2026-10-09",
+          "rule": "severe30",
+          "deviation": "1.623659128539436894080334700584742",
+          "threshold": "2",
+          "label": "30日严重异动",
+          "reachable": true,
+          "required": "0.1517844345707324064784291242654436",
+          "indexStart": "3725.810",
+          "price": "80.36",
+          "end": "2026-11-10",
+          "indexEnd": "3191.5700",
+          "theory": "80.35646871418564016952018487255120",
+          "direction": "UP",
+          "base": "28.13"
+        }
+      ],
+      "price": "69.77",
+      "stock": {
+        "excluded": false,
+        "symbol": "sz301313",
+        "name": "凡拓数创"
+      },
+      "target": "2026-11-10"
+    },
+    {
+      "symbol": "sz300949",
+      "hits": [
+        {
+          "sessions": 30,
+          "satisfied": false,
+          "start": "2026-09-22",
+          "rule": "severe30",
+          "deviation": "1.636652737436545756979730002317470",
+          "threshold": "2",
+          "label": "30日严重异动",
+          "reachable": true,
+          "required": "0.1502664298401420959147424511545293",
+          "indexStart": "4082.690",
+          "price": "64.76",
+          "end": "2026-11-10",
+          "indexEnd": "3191.5700",
+          "theory": "64.75872427247721477751188554604930",
+          "direction": "UP",
+          "base": "23.28"
+        }
+      ],
+      "price": "56.30",
+      "stock": {
+        "excluded": false,
+        "symbol": "sz300949",
+        "name": "奥雅股份"
+      },
+      "target": "2026-11-10"
+    }
+  ],
+  "unitTests": [
+    {
+      "name": "cn.yidongchi.core.PriceEngineTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.core.ProjectionTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.core.ReviewRegressionTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.core.TomorrowPoolTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.core.WatchlistTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.app.MarketParserTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.app.PoolLiveScanTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1"
+    },
+    {
+      "name": "cn.yidongchi.app.PoolRepositoryTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.app.PoolTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.yidongchi.app.ScreenshotComparisonTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ]
+}

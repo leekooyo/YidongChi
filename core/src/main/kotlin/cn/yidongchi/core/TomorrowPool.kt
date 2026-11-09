@@ -18,6 +18,15 @@ object TomorrowPool {
             else->null
         }
         if(excluded!=null)return PoolStock(stock,target,current.close,emptyList(),excluded)
+        val relevant=SecurityEligibility.apply(stock,bars).takeLastWhile{it.eligible}.takeLast(29)
+            .filter{resets.severe==null||resets.severe>target||it.date>=resets.severe}
+        val indexDates=index.map{it.date}.toSet()
+        if(relevant.isNotEmpty()) {
+            val first=relevant.first().date
+            require(first.year==2026){"指数窗口跨未收录交易日历年份"}
+            val expected=generateSequence(first){it.plusDays(1)}.takeWhile{it<=current.date}.filter{TradingCalendar.isTradingDay(it)}
+            require(relevant.all{it.date in indexDates}&&expected.all{it in indexDates}){"指数日期不完整，暂不能计算"}
+        }
         val analysis=Projection.project(stock,bars,index,Scenario(),1,resets).single().analysis
         val hits=analysis.levels.filter {it.ruleId!="normal"&&(it.satisfied||it.reachable)}.map {
             PoolHit(it,if(it.satisfied)BigDecimal.ZERO else it.price.subtract(current.close).ratio(current.close))

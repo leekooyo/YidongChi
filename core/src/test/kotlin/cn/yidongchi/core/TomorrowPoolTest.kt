@@ -41,4 +41,11 @@ class TomorrowPoolTest {
         val holiday=LocalDate.parse("2026-09-30")
         assertEquals(LocalDate.parse("2026-10-08"),TomorrowPool.calculate(stock,listOf(Bar(holiday,"19".bd(),"10".bd())),listOf(Bar(holiday,"100".bd(),"100".bd()))).targetDate)
     }
+    @Test fun missingRelevantIndexDateIsNotASuccessfulNegative() {
+        val dates=TradingCalendar.nextDays(LocalDate.parse("2026-10-19"),12)
+        val bars=dates.mapIndexed{i,d->Bar(d,"19".bd(),(if(i==0)"10"else "19").bd())}
+        val indices=dates.filter{it!=dates[3]}.map{Bar(it,"100".bd(),"100".bd())}
+        try{TomorrowPool.calculate(stock,bars,indices);fail("指数缺日必须报未计算")}
+        catch(e:IllegalArgumentException){assertTrue(e.message!!.contains("指数日期不完整"))}
+    }
 }

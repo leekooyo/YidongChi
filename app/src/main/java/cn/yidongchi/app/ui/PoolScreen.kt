@@ -39,7 +39,6 @@ import java.time.format.DateTimeFormatter
     var ascending by remember{mutableStateOf(true)}
     var details by remember{mutableStateOf(false)}
     var expanded by remember{mutableStateOf<String?>(null)}
-    var confirmRescan by remember{mutableStateOf(false)}
     val rows=remember(batch,direction,rule,onlyWatches,state.watches,ascending) {
         TomorrowPool.filtered(batch?.rows?:emptyList(),direction,rule,if(onlyWatches)state.watches.map{it.symbol}.toSet()else null).let{if(ascending)it else it.reversed()}
     }
@@ -49,26 +48,29 @@ import java.time.format.DateTimeFormatter
                 Text("明日可能异动",Modifier.weight(1f),fontSize=21.sp,fontWeight=FontWeight.Bold)
                 Pill("条件估算",Amber)
             }
-            if(batch==null)Text("全部沪深 A 股") else {
-                val target=TradingCalendar.nextDays(batch.basis.time.toLocalDate(),1).first()
-                Text("${target.toString().drop(5)} · 指数不变",fontSize=18.sp)
+            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
+                Text("全部沪深 A 股")
+                if(batch!=null)Text("${TradingCalendar.nextDays(batch.basis.time.toLocalDate(),1).first().toString().drop(5)} · 指数不变")
+            }
+            if(batch!=null) {
                 val intraday=batch.basis.time.toLocalTime()<LocalTime.of(15,0)
-                Text("基准 ${batch.basis.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))}${if(intraday)" · 盘中估算"else ""}",color=MaterialTheme.colorScheme.onSurfaceVariant)
-                val label=when{state.poolRunning->"扫描中";batch.complete->"扫描完成";else->"未完成"}
-                Text("$label ${batch.processed} / ${batch.universe.size}")
+                val label=when{state.poolRunning->"扫描中";batch.complete->"完成";else->"未完成"}
+                Text("${batch.basis.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))} · $label ${batch.processed}/${batch.universe.size}${if(intraday)" · 盘中估算"else ""}",color=MaterialTheme.colorScheme.onSurfaceVariant)
                 if(state.poolRunning)LinearProgressIndicator(progress={batch.processed.toFloat()/batch.universe.size.coerceAtLeast(1)},modifier=Modifier.fillMaxWidth())
-                TextButton(onClick={details=true},contentPadding=PaddingValues(0.dp)) {Text("命中 ${batch.rows.size} · 失败 ${batch.failures.size} · 排除 ${batch.exclusions.size}")}
             }
             if(state.poolError.isNotBlank())Text(state.poolError,color=Amber)
-            Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
+                if(batch!=null)TextButton(onClick={details=true},modifier=Modifier.weight(1f),contentPadding=PaddingValues(0.dp)) {Text("命中 ${batch.rows.size} · 失败 ${batch.failures.size} · 排除 ${batch.exclusions.size}")}
                 if(state.poolRunning) {
                     OutlinedButton(onClick={state.pausePool()}){Text("暂停扫描")}
                     if(batch==null)Text("正在读取全市场清单",Modifier.align(Alignment.CenterVertically))
                 }else {
-                    Button(onClick={if(batch?.complete==true)confirmRescan=true else state.startPool()},enabled=!state.poolLoading){Text(when{state.poolLoading->"读取上次记录";batch==null->"开始扫描";batch.complete->"重新扫描";else->"继续扫描"})}
-                    if(batch!=null&&batch.failures.isNotEmpty())OutlinedButton(onClick={state.startPool(retry=true)}){Text("重试失败项")}
-                    if(batch!=null&&!batch.complete)TextButton(onClick={confirmRescan=true}){Text("重扫")}
+                    Button(onClick={state.startPool(newBatch=batch?.complete==true)},enabled=!state.poolLoading){Text(when{state.poolLoading->"读取上次记录";batch==null->"开始扫描";batch.complete->"重新扫描";else->"继续扫描"})}
                 }
+            }
+            if(batch!=null&&!state.poolRunning&&!batch.complete)Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                    if(batch!=null&&batch.failures.isNotEmpty())OutlinedButton(onClick={state.startPool(retry=true)}){Text("重试失败项")}
+                    TextButton(onClick={state.startPool(newBatch=true)}){Text("重扫")}
             }
         }}
         item {Column {
@@ -104,7 +106,6 @@ import java.time.format.DateTimeFormatter
             }
         }
     }
-    if(confirmRescan)AlertDialog(onDismissRequest={confirmRescan=false},title={Text("重新扫描全市场？")},text={Text("使用最新行情重新建立股票池，替换上次结果。日线缓存继续复用。")},confirmButton={TextButton(onClick={confirmRescan=false;state.startPool(newBatch=true)}){Text("重新扫描")}},dismissButton={TextButton(onClick={confirmRescan=false}){Text("取消")}})
     if(details&&batch!=null)AlertDialog(onDismissRequest={details=false},title={Text("扫描详情")},text={
         LazyColumn(Modifier.heightIn(max=400.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
             item{Text("${(batch.outcomes.values.mapNotNull{it.provider}+batch.basis.provider).distinct().joinToString("\n")}\n假设指数不变；公告重置与特殊状态未全面核实。\n排除和失败不等于没有异动。")}

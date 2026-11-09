@@ -10,6 +10,9 @@ import org.junit.runner.RunWith
 import cn.yidongchi.core.*
 import java.time.LocalDate
 import java.time.LocalDateTime
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.*
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class PoolScreenTest {
@@ -21,7 +24,7 @@ class PoolScreenTest {
         ui.waitUntil(35_000){!state.busy}
         ui.runOnIdle{state.active=false}
         ui.onNodeWithText("明日池").performClick()
-        ui.onNodeWithText("开始扫描").assertExists()
+        ui.onNode(hasText("开始扫描") or hasText("继续扫描") or hasText("重新扫描")).assertExists()
         ui.onNodeWithText("全部沪深 A 股").assertExists()
     }
     @Test fun filterAddWatchAndOpenNextDayWithFlatIndex() {
@@ -61,5 +64,33 @@ class PoolScreenTest {
         ui.onNodeWithText("次日",substring=true).performScrollTo().assertIsSelected()
         ui.onNodeWithText("指数不变").assertIsSelected()
         ui.runOnIdle{if(!wasWatched)state.remove(stock.symbol)}
+    }
+    @Test fun realScanCanPauseAndContinueWithoutResettingProgress() {
+        ui.waitForIdle()
+        if(ui.onAllNodesWithText("开始使用").fetchSemanticsNodes().isNotEmpty())ui.onNodeWithText("开始使用").performClick()
+        val state=ViewModelProvider(ui.activity)[AppState::class.java]
+        ui.waitUntil(35_000){!state.busy&&!state.poolLoading}
+        ui.onNodeWithText("明日池").performClick()
+        try {
+            val previous=state.poolBatch
+            ui.runOnIdle{state.active=false;state.startPool(newBatch=true)}
+            ui.waitUntil(150_000){state.poolBatch!==previous&&(state.poolBatch?.processed?:0)>=6||state.poolError.isNotBlank()}
+            assertEquals("",state.poolError)
+            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("暂停扫描"))
+            ui.onNodeWithText("暂停扫描").performScrollTo().assertIsDisplayed().performClick()
+            ui.waitUntil(35_000){!state.poolRunning}
+            val processed=state.poolBatch!!.processed
+            assertTrue(processed>=6)
+            val context=InstrumentationRegistry.getInstrumentation().targetContext
+            assertEquals(processed,PoolCodec.decode(File(context.filesDir,"pool/batch.json").readText()).processed)
+            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("继续扫描"))
+            ui.onNodeWithText("继续扫描").performScrollTo().assertIsDisplayed().performClick()
+            ui.waitUntil(60_000){(state.poolBatch?.processed?:0)>processed||state.poolError.isNotBlank()}
+            assertEquals("",state.poolError)
+            assertTrue(state.poolBatch!!.processed>processed)
+        }finally{
+            ui.runOnIdle{state.pausePool()}
+            ui.waitUntil(35_000){!state.poolRunning}
+        }
     }
 }

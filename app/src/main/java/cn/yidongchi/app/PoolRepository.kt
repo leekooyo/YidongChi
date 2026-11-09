@@ -7,7 +7,8 @@ import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.time.LocalDate
 
-class PoolRepository(private val directory:File,private val request:(String,Boolean)->String=MarketRepository()::get):PoolSource {
+class PoolRepository(private val directory:File,private val request:((String,Boolean)->String)?=null):PoolSource {
+    private val market=MarketRepository()
     private val indexSymbols=listOf("sh000002","sz399107","sh000688","sz399102")
     private val requestGate=Mutex()
     private var lastRequest=0L
@@ -17,8 +18,20 @@ class PoolRepository(private val directory:File,private val request:(String,Bool
     private val alternateProvider="腾讯即时报价 / 东方财富前复权日线"
     init {directory.mkdirs()}
     private suspend fun fetch(url:String,gbk:Boolean=false):String {
+        currentCoroutineContext().ensureActive()
         requestGate.withLock {delay((100L-(System.currentTimeMillis()-lastRequest)).coerceAtLeast(0));lastRequest=System.currentTimeMillis()}
-        return request(url,gbk)
+        currentCoroutineContext().ensureActive()
+        return suspendCancellableCoroutine {continuation->
+            val connection=java.util.concurrent.atomic.AtomicReference<java.net.HttpURLConnection?>()
+            continuation.invokeOnCancellation{connection.get()?.disconnect()}
+            try {
+                val text=if(request!=null)request.invoke(url,gbk)else market.get(url,gbk){opened->
+                    connection.set(opened)
+                    if(!continuation.isActive)throw CancellationException("扫描已暂停")
+                }
+                if(continuation.isActive)continuation.resumeWith(Result.success(text))
+            }catch(e:Exception){if(continuation.isActive)continuation.resumeWith(Result.failure(e))}
+        }
     }
     override suspend fun universe():List<Stock> = withContext(Dispatchers.IO) {
         PoolUniverse.collect {page->PoolCodec.universePage(fetch("https://push2.eastmoney.com/api/qt/clist/get?pn=$page&pz=100&po=1&np=1&fltt=2&invt=2&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f12,f13,f14"))}
@@ -40,6 +53,7 @@ class PoolRepository(private val directory:File,private val request:(String,Bool
         val dates=quotes.values.map{it.time.toLocalDate()}.distinct()
         require(dates.size==1){"板块指数行情日期不一致"}
         val date=dates.single();TradingCalendar.nextDays(date,1)
+        prune(date)
         var provider="腾讯公开行情"
         val history=try{indexSymbols.associateWith{history(it,date,provider)}}catch(e:Exception){if(e is CancellationException)throw e;primaryUnavailable=true;provider=alternateProvider;indexSymbols.associateWith{history(it,date,provider)}}
         PoolBasis(quotes.values.maxOf{it.time},history.mapValues{(s,b)->MarketParser.withQuote(b,quotes.getValue(s),true)},provider)
@@ -55,6 +69,9 @@ class PoolRepository(private val directory:File,private val request:(String,Bool
         }
     }
     override suspend fun load(stock:Stock,basis:PoolBasis):MarketSnapshot=withContext(Dispatchers.IO) {
+        // 发行人2025半年报：600849已变更为601607。清单仍保留“上药转换”占位记录。
+        // https://dataclouds.cninfo.com.cn/shgonggao/2025/2025-08-29/0137cf4083e511f0a61ffa163e957f7a.pdf
+        if(stock.symbol=="sh600849"&&stock.name=="上药转换")throw PoolExcluded("历史转换代码，现证券代码为601607")
         val raw=MarketParser.quote(stock.symbol,fetch("https://qt.gtimg.cn/q=${stock.symbol}",true))
         require(raw.time.toLocalDate()==basis.time.toLocalDate()){"个股行情日期不一致或停牌"}
         if(raw.volume.signum()==0)throw PoolExcluded("停牌或当日无成交")
@@ -78,6 +95,14 @@ class PoolRepository(private val directory:File,private val request:(String,Bool
         MarketSnapshot(quote,iq,aligned,index,effective.provider)
     }
     fun cached():PoolBatch?=File(directory,"batch.json").takeIf{it.isFile}?.let{PoolCodec.decode(it.readText())}
+    fun prune(current:LocalDate) {
+        val protected=runCatching{cached()?.basis?.time?.toLocalDate()}.getOrNull()
+        val name=Regex("^(\\d{4}-\\d{2}-\\d{2})-(tencent|eastmoney)-(sh|sz)\\d{6}\\.json$")
+        directory.listFiles()?.filter{it.isFile}?.forEach{file->
+            val date=name.matchEntire(file.name)?.groupValues?.get(1)?.let(LocalDate::parse)
+            if(date!=null&&date<current.minusDays(7)&&date!=protected)file.delete()
+        }
+    }
     fun save(batch:PoolBatch) {
         val temp=File(directory,"batch.tmp");temp.writeText(PoolCodec.encode(batch))
         java.nio.file.Files.move(temp.toPath(),File(directory,"batch.json").toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING)
