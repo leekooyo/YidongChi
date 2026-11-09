@@ -1,0 +1,32 @@
+[
+  {
+    "suite": "cn.yidongchi.core.PriceEngineTest",
+    "tests": 12,
+    "failures": 0
+  },
+  {
+    "suite": "cn.yidongchi.core.ProjectionTest",
+    "tests": 5,
+    "failures": 0
+  },
+  {
+    "suite": "cn.yidongchi.core.ReviewRegressionTest",
+    "tests": 7,
+    "failures": 0
+  },
+  {
+    "suite": "cn.yidongchi.core.WatchlistTest",
+    "tests": 3,
+    "failures": 0
+  },
+  {
+    "suite": "cn.yidongchi.app.MarketParserTest",
+    "tests": 6,
+    "failures": 0
+  },
+  {
+    "suite": "cn.yidongchi.app.ScreenshotComparisonTest",
+    "tests": 2,
+    "failures": 0
+  }
+]

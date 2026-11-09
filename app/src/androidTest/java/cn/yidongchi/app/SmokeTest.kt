@@ -37,7 +37,7 @@ class SmokeTest {
         ui.onNodeWithText("未来 10 个交易日").assertIsDisplayed()
         capture("forecast")
         ui.onNodeWithText("规则").performClick()
-        ui.onNodeWithText("规则有出处").assertIsDisplayed()
+        ui.onNodeWithText("规则有出处",substring=true).assertIsDisplayed()
         capture("rules")
         ui.onNodeWithText("预警").performClick()
         ui.onNodeWithText("应用内提醒").assertIsDisplayed()

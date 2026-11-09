@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-09",
+  "quoteUrl": "https://qt.gtimg.cn/q=<symbol>",
+  "dailyUrl": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=<symbol>,day,,,120,qfq",
+  "screenshotNextDay": {
+    "002242": "26.88",
+    "002086": "4.64",
+    "300949": "64.76",
+    "301697": "41.34"
+  },
+  "note": "用户截图为对照材料；现价核对一致，日线来自腾讯公开行情。奥雅当日截图63.52为另行核对的取整差异，不当作引擎期望值。"
+}

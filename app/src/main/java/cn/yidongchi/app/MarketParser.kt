@@ -14,6 +14,10 @@ data class MarketSnapshot(val quote:Quote,val indexQuote:Quote,val bars:List<Bar
 }
 
 object MarketParser {
+    fun withQuote(bars:List<Bar>,quote:Quote,index:Boolean=false):List<Bar> {
+        val date=quote.time.toLocalDate()
+        return bars.filter {it.date<date}+Bar(date,quote.price,quote.previousClose,quote.high,quote.low,eligible=index||quote.upper!=null)
+    }
     fun stockMetadata(stock:Stock,text:String):Stock {
         val raw=JSONObject(text).getJSONObject("data").getInt("f189").toString()
         val date=LocalDate.parse(raw,DateTimeFormatter.BASIC_ISO_DATE)

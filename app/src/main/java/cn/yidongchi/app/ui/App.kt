@@ -44,8 +44,8 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun YidongApp(state:AppState) {
     val dark=when(state.theme){"dark"->true;"light"->false;else->isSystemInDarkTheme()}
-    val colors=if(dark)darkColorScheme(primary=Color(0xFFB8D989),primaryContainer=Color(0xFF294E48),secondary=Color(0xFF87BCB3),secondaryContainer=Color(0xFF29413D),background=Color(0xFF101D23),surface=Color(0xFF172830))
-        else lightColorScheme(primary=Accent,primaryContainer=Color(0xFFDFF0D9),secondary=Color(0xFF557B71),secondaryContainer=Color(0xFFE0ECE6),background=Color(0xFFF4F6F2),surface=Color(0xFFFFFFFF))
+    val colors=if(dark)darkColorScheme(primary=Color(0xFFB8D989),primaryContainer=Color(0xFF294E48),secondary=Color(0xFF87BCB3),secondaryContainer=Color(0xFF29413D),background=Color(0xFF0D171E),surface=Color(0xFF1D2D38),outline=Color(0xFF819BAA),outlineVariant=Color(0xFF526D7D))
+        else lightColorScheme(primary=Accent,primaryContainer=Color(0xFFD9EEE6),secondary=Color(0xFF557B71),secondaryContainer=Color(0xFFD5EAE3),background=Color(0xFFE5ECEF),surface=Color.White,outline=Color(0xFF738995),outlineVariant=Color(0xFFABBDC7))
     MaterialTheme(colorScheme=colors) {
         var page by remember {mutableIntStateOf(0)}
         var settings by remember {mutableStateOf(false)}
@@ -56,10 +56,10 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
         LaunchedEffect(state.active){while(state.active){val now=LocalDateTime.now(ZoneId.of("Asia/Shanghai"));if(TradingCalendar.isTradingDay(now.toLocalDate())&&now.hour in 9..15)state.refresh();delay(15_000)}}
         LaunchedEffect(state.message){if(state.message.isNotBlank()){snackbar.showSnackbar(state.message);state.message=""}}
         Scaffold(topBar={Column(Modifier.statusBarsPadding().padding(horizontal=20.dp,vertical=12.dp)) {
-            Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("异动尺",fontSize=25.sp,fontWeight=FontWeight.Bold);Text("把每一档价格，算清楚。",fontSize=12.sp,color=MaterialTheme.colorScheme.onSurfaceVariant)}
+            Row(verticalAlignment=Alignment.CenterVertically){Text("异动尺",Modifier.weight(1f),fontSize=25.sp,fontWeight=FontWeight.Bold)
                 IconButton(onClick={state.refreshNow()}){Icon(Icons.Outlined.Refresh,"刷新行情")};IconButton(onClick={settings=true}){Icon(Icons.Outlined.Settings,"设置")}}
             if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth().padding(top=8.dp))
-        }},snackbarHost={SnackbarHost(snackbar)},bottomBar={NavigationBar {
+        }},snackbarHost={SnackbarHost(snackbar)},bottomBar={NavigationBar(containerColor=MaterialTheme.colorScheme.surface) {
             val labels=listOf("自选","计算","推演","预警","规则")
             val icons=listOf(Icons.Outlined.StarOutline,Icons.Outlined.Calculate,Icons.Outlined.Timeline,Icons.Outlined.NotificationsNone,Icons.Outlined.MenuBook)
             labels.forEachIndexed {i,s->NavigationBarItem(selected=page==i,onClick={page=i},icon={Icon(icons[i],s)},label={Text(s)})}
@@ -78,13 +78,13 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
 }
 
 @Composable fun Section(title:String,subtitle:String?=null,content:@Composable ColumnScope.()->Unit) {
-    Column(Modifier.fillMaxWidth().padding(vertical=6.dp)) {Text(title,fontSize=18.sp,fontWeight=FontWeight.SemiBold);if(subtitle!=null)Text(subtitle,fontSize=12.sp,color=MaterialTheme.colorScheme.onSurfaceVariant);Spacer(Modifier.height(10.dp));content()}
+    Column(Modifier.fillMaxWidth().padding(vertical=6.dp)) {Text(title,fontSize=19.sp,fontWeight=FontWeight.SemiBold);if(subtitle!=null)Text(subtitle,fontSize=14.sp,color=MaterialTheme.colorScheme.onSurfaceVariant);Spacer(Modifier.height(10.dp));content()}
 }
 @Composable fun Panel(modifier:Modifier=Modifier,content:@Composable ColumnScope.()->Unit) {
-    Surface(modifier.fillMaxWidth(),shape=RoundedCornerShape(20.dp),color=MaterialTheme.colorScheme.surface,tonalElevation=1.dp) {Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp),content=content)}
+    Surface(modifier.fillMaxWidth(),shape=RoundedCornerShape(16.dp),color=MaterialTheme.colorScheme.surface,border=BorderStroke(1.dp,MaterialTheme.colorScheme.outlineVariant),shadowElevation=1.dp) {Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp),content=content)}
 }
-@Composable fun Note(text:String,color:Color=MaterialTheme.colorScheme.onSurfaceVariant) {Text(text,fontSize=12.sp,color=color,lineHeight=18.sp)}
-@Composable fun Pill(text:String,color:Color=Accent) {Surface(shape=RoundedCornerShape(8.dp),color=color.copy(alpha=.10f)){Text(text,Modifier.padding(horizontal=8.dp,vertical=4.dp),fontSize=11.sp,color=color)}}
+@Composable fun Note(text:String,color:Color=MaterialTheme.colorScheme.onSurfaceVariant) {Text(text,fontSize=14.sp,color=color,lineHeight=21.sp)}
+@Composable fun Pill(text:String,color:Color=Accent) {Surface(shape=RoundedCornerShape(8.dp),color=color.copy(alpha=.12f)){Text(text,Modifier.padding(horizontal=8.dp,vertical=4.dp),fontSize=13.sp,color=color)}}
 @Composable fun SearchBox(state:AppState,onOpen:(String)->Unit) {
     Column {OutlinedTextField(state.searchText,{state.search(it)},Modifier.fillMaxWidth(),label={Text("股票代码 / 名称 / 粘贴内容")},leadingIcon={Icon(Icons.Outlined.Search,null)},singleLine=true,shape=RoundedCornerShape(16.dp))
         state.suggestions.forEach {s->Row(Modifier.fillMaxWidth().clickable {state.searchText="";state.search("");onOpen(s.symbol)}.padding(12.dp),verticalAlignment=Alignment.CenterVertically){Text(s.name,Modifier.weight(1f));Text(s.code);IconButton(onClick={state.add(s)}){Icon(Icons.Outlined.Add,"加入自选")}}}
@@ -92,11 +92,10 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
     }
 }
 @Composable fun SnapshotHeader(state:AppState,s:MarketSnapshot) {
-    Panel {Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(s.quote.stock.name,fontSize=21.sp,fontWeight=FontWeight.Bold);Note("${s.quote.stock.code} · ${s.quote.stock.board.label} · ${s.quote.stock.board.currency}")};IconButton(onClick={if(state.watches.any {it.symbol==s.quote.stock.symbol})state.remove(s.quote.stock.symbol) else state.add(s.quote.stock)}){Icon(if(state.watches.any {it.symbol==s.quote.stock.symbol})Icons.Outlined.Star else Icons.Outlined.StarOutline,"切换自选")}}
+    Panel {Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(s.quote.stock.name,fontSize=21.sp,fontWeight=FontWeight.Bold);Note("${s.quote.stock.code} · ${s.quote.stock.board.label}")};IconButton(onClick={if(state.watches.any {it.symbol==s.quote.stock.symbol})state.remove(s.quote.stock.symbol) else state.add(s.quote.stock)}){Icon(if(state.watches.any {it.symbol==s.quote.stock.symbol})Icons.Outlined.Star else Icons.Outlined.StarOutline,"切换自选")}}
         val change=s.quote.price.ratio(s.quote.previousClose).subtract(BigDecimal.ONE)
         Row(verticalAlignment=Alignment.Bottom,horizontalArrangement=Arrangement.spacedBy(12.dp)){Text(s.quote.price.money(),fontSize=if(state.large)44.sp else 36.sp,fontWeight=FontWeight.Bold,color=if(change.signum()>=0)Up else Down);Text(change.pct(),color=if(change.signum()>=0)Up else Down,modifier=Modifier.padding(bottom=6.dp))}
-        Note("行情 ${s.quote.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm:ss"))} · ${s.provider}")
-        Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){Pill("条件估算",Amber);if(s.quote.stock.board==Board.STAR)Pill("科创累计口径待补证",Amber);if(state.errors.containsKey(s.quote.stock.symbol))Pill("缓存",Amber)}
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Note(s.quote.time.format(DateTimeFormatter.ofPattern("MM-dd HH:mm")));Pill(if(state.errors.containsKey(s.quote.stock.symbol))"缓存估算"else "估算",Amber)}
         state.errors[s.quote.stock.symbol]?.let {Note(it,Amber)}
     }
 }

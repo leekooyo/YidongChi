@@ -47,15 +47,9 @@ class MarketRepository {
                 val a=daily(symbol);val b=daily(index);a.await() to b.await()
             }
         }
-        fun integrate(bars:List<Bar>,quote:Quote):List<Bar> {
-            val date=quote.time.toLocalDate()
-            val old=bars.filter {it.date<date}
-            val current=Bar(date,quote.price,quote.previousClose,quote.high,quote.low,eligible=quote.upper!=null||quote.stock.symbol==index)
-            return old+current
-        }
-        val bars=integrate(pair.first,q).let {history->
+        val bars=MarketParser.withQuote(pair.first,q).let {history->
             if(stock.listedOn==null&&history.size<35)history.map {it.copy(eligible=false)} else history
-        };val ix=integrate(pair.second,iq)
+        };val ix=MarketParser.withQuote(pair.second,iq,true)
         require(bars.size>=2&&ix.size>=2){"历史日线不足，暂时不能推算"}
         // 不补造停牌日；有历史停牌或参考价不全时维持条件估算标记。
         MarketSnapshot(q,iq,bars,ix,provider)

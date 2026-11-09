@@ -31,7 +31,7 @@ import cn.yidongchi.app.*
         HorizontalDivider()
         Text("快速说明")
         Note("临界价：给定指数点位和起算条件下，刚好满足某个价格指标的报价。\n偏离：个股区间收益减基准指数区间收益。\n3/10/30日：交易日观察窗口，并非自然日。\n监控期间：特定事件后的监管规定，不等于股票禁止交易。\n条件估算：重置、除权或证券历史状态尚未完整核实。")
-        Note("异动尺 0.1.0 · 本地保存，无账号。规则核验截至 2026-11-09；2026交易日历之后需更新。")
+        Note("异动尺 0.1.1 · 本地保存，无账号。规则核验截至 2026-11-09；2026交易日历之后需更新。")
     }},confirmButton={TextButton(onClick=onDismiss){Text("完成")}})
     pending?.let {text->val data=BackupCodec.decode(text);AlertDialog(onDismissRequest={pending=null},title={Text("合并备份")},text={Text("识别到 ${data.items.size} 只自选；现有股票分组优先保留。将保存导入前恢复副本。")},confirmButton={TextButton(onClick={state.import(text);pending=null}){Text("合并")}},dismissButton={TextButton(onClick={pending=null}){Text("取消")}})}
 }
