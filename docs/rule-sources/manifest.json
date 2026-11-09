@@ -1,0 +1,250 @@
+[
+  {
+    "file": "sse-trading-2026.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/10816482/files/e3a3b98e36894edca77841837936e006.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 65302,
+    "sha256": "fc922c433438b2636cb631eab25cca405209712acbb6aaded768c45456ff8888",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-changes-2026.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/10816482/files/e1714f2ce19948ce8917d5c86257205c.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 16084,
+    "sha256": "6c0ffbb11664654442ff0907c8ab109349c1b7665b6745998d34c1219ec98aa1",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-deferred-2026.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/10816482/files/c4510656662e48dc9d8d0deb8cc864b3.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 16476,
+    "sha256": "f4a0d0976a01e3e95f82460170900993824b70d91183e42d09e13ba10a9958c5",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-main-monitor.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/10779397/files/b1f3785a30464bfcb0c186f6e56149d0.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 27309,
+    "sha256": "3d34bb8cb12288e81a92e65e1aeff32b6669611f87d6cbbc1e583b8cc77318b1",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-star-monitor.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/10779400/files/06022bf38db84329bdbcaed849b1226a.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 22464,
+    "sha256": "8bfdea43509776e6064a01c4ca15b4be8ab12bed1b3665332938f15909268687",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-main-listing-2026.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/10816589/files/3bd33cd0e271469e9fc311c81f1b02d8.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 175143,
+    "sha256": "988941c6c98214908aa9438e3ea359881022d192fc3b48aa49fff95523dce627",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-trading-2026.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 282084,
+    "sha256": "9b66f8b0db70f84a25ef1ccb4ee2351001724e408117552d75f6d8993483c586",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-main-listing-2026.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/stock/W020260424747613955674.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 730466,
+    "sha256": "958a07598a1919fe7fed7695c9e778dd029d72a38cf48faeba54cfefdb7c581c",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-chinext-listing-2026.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/stock/supervision/chinext/W020260424688875101057.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 600198,
+    "sha256": "943802fc89787f22910edb225fb0a868f38ae112f35328b3a54536bb44ec3889",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-main-monitor.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/stock/W020230217570611262391.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 306254,
+    "sha256": "79088fda7e6416443a02a1d29b61c851d91bdbd78866c1e4c964ca3a99673fe4",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-chinext-monitor-2023.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/allrules/bussiness/W020250327502095568538.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 164966,
+    "sha256": "74fb2460714f2e3c4d419f484930b1fbcbcd6fdeaa59e0de9fec1335d27c6b8c",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-star-listing-2026.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/staripo/c/10816592/files/46c70bc5f8df415a847ec1173fb575ec.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 172062,
+    "sha256": "646a146de1f0d4fc03572b414b2c2c0d0127dd1346d0c60c276f90126e3bc5c6",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-suspension-2025.docx",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/10779127/files/a0a0af31447746c29ed0e85d06898d78.docx",
+    "retrievedDate": "2026-11-09",
+    "bytes": 24993,
+    "sha256": "579bc76e5291476cec896cf50576904850c54fe6f0b0a8a5ea903a44c66700cf",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-suspension-2023.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/all/W020250327502094981682.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 193767,
+    "sha256": "d926ffe96a7ccf4082a0e7fed54bf1350316d95b56fb9e6eb4ff41dbd02f7430",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "case-szse-shangshui-20260930.pdf",
+    "url": "https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-09-30/7b11da00-9ca1-42bd-a531-0a8f5d236dcb.PDF",
+    "retrievedDate": "2026-11-09",
+    "bytes": 99201,
+    "sha256": "4985aa1ce83467c488341a1699f470516fbadccdc2e31793a3b77a865b19a245",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-change-2025.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/all/W020250328578470423581.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 1718725,
+    "sha256": "cccaf389804aec9fb04524ee6522b928d34756672e60ed8309214aef92438f49",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-attachment1-2025.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/all/W020250328363063895233.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 1718679,
+    "sha256": "08b8bb55db23328830f5af737ba174e60fdc7144d7e0f7532debc2b85d6e83fc",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-attachment2-2025.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/all/W020250328363064262770.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 550324,
+    "sha256": "fbc8d212057dae330ef44f36f41422e5da41454abed5ee803b3eda3f0dae9281",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "szse-risk-guide-2026.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/service/member/W020260630577988348432.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 163986,
+    "sha256": "e80519e09fcf77527f6e6c5ce964111f21842cb38ad84dd59234fb304c1406d0",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "case-star-jinan-20261008.pdf",
+    "url": "https://static.cninfo.com.cn/finalpage/2026-10-08/1225595332.PDF",
+    "retrievedDate": "2026-11-09",
+    "bytes": 128190,
+    "sha256": "12101954b8ae27fe5d0e71b79dd7b8eaa7de9935dbb8c41e525efca8d02cb4cf",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "case-star-yunzhong-stop-20260626.pdf",
+    "url": "https://static.cninfo.com.cn/finalpage/2026-06-26/1225388995.PDF",
+    "retrievedDate": "2026-11-09",
+    "bytes": 124529,
+    "sha256": "e1575292bdf3f1887f75bf8a6c69f36887be69a2812fa6749ea03f4d4ad2b217",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "case-star-yunzhong-resume-20260701.pdf",
+    "url": "https://static.cninfo.com.cn/finalpage/2026-07-01/1225401109.PDF",
+    "retrievedDate": "2026-11-09",
+    "bytes": 124045,
+    "sha256": "674f8d022905f9a6d4b7c3d3aae7198284f7551464055644f4a6c15b617c4d93",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "case-star-qingyue-20260911.pdf",
+    "url": "https://static.cninfo.com.cn/finalpage/2026-09-11/1225558620.PDF",
+    "retrievedDate": "2026-11-09",
+    "bytes": 116256,
+    "sha256": "f3e1cb2c0508f4e6d874818ae21e6ebd277e9a9bade82364b6b0e263419fcdc7",
+    "status": "downloaded and text extracted"
+  },
+  {
+    "file": "sse-calendar-2026.html",
+    "url": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20251222_10802507.shtml",
+    "retrievedDate": "2026-11-09",
+    "bytes": 28038,
+    "sha256": "ff188c710b8904758c185eb955e9eaa2c9bd7c2061af984d4f1d743f899c12a4",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "sse-calendar-autumn-2026.html",
+    "url": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20260915_10832273.shtml",
+    "retrievedDate": "2026-11-09",
+    "bytes": 26880,
+    "sha256": "070610b8371dcb2fb094cbbeaf9ecb1bf515949c6da09edb7afe4888d6f574b4",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "sse-trading-notice-2026.html",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "retrievedDate": "2026-11-09",
+    "bytes": 33591,
+    "sha256": "0b711dcf306c243625cc5c8830f8b96888f779a73d1b981883b67fa52bdf9868",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "szse-trading-notice-2026.html",
+    "url": "https://www.szse.cn/lawrules/rule/trade/current/t20260424_620190.html",
+    "retrievedDate": "2026-11-09",
+    "bytes": 19374,
+    "sha256": "08d05a9d3f9c7dac31e8ac33712bac26b3995585718031e99a953e9128eec2d2",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "szse-change-notice-2025.html",
+    "url": "https://www.szse.cn/lawrules/rule/all/t20250328_612605.html",
+    "retrievedDate": "2026-11-09",
+    "bytes": 21125,
+    "sha256": "f68b72e2d3e46be9871585370c74652c239b18c047dabdd2000082190e8642f8",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "sse-star-index-history.html",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/repeal/rules/c/c_20200619_10785119.shtml",
+    "retrievedDate": "2026-11-09",
+    "bytes": 27142,
+    "sha256": "12e0c6d1cb107543db2f9c37e25663e5104041caa261dfe630b4a1246eefb674",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "sse-old-trading-2023.html",
+    "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/repeal/rules/c/c_20250612_10824490.shtml",
+    "retrievedDate": "2026-11-09",
+    "bytes": 34499,
+    "sha256": "41674dd8ae45aa79628c5a298c9b90f3a50e8b7a2f0a5df96cc146870ca13b46",
+    "status": "downloaded original html"
+  },
+  {
+    "file": "szse-changes-2026.pdf",
+    "url": "https://docs.static.szse.cn/www/lawrules/rule/trade/current/W020260424690713346617.pdf",
+    "retrievedDate": "2026-11-09",
+    "bytes": 141508,
+    "sha256": "3a309bf5b4f7b2ee170b897084397568c7a1db939b398f4ab8999587501c727a",
+    "status": "downloaded and text extracted"
+  }
+]

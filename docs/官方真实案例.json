@@ -1,0 +1,59 @@
+[
+  {
+    "id": "star-jinan-20260930",
+    "code": "688137",
+    "name": "近岸蛋白",
+    "announcementDate": "2026-10-08",
+    "announcementNumber": "2026-039",
+    "sourceUrl": "https://static.cninfo.com.cn/finalpage/2026-10-08/1225595332.PDF",
+    "sourceFile": "rule-sources/case-star-jinan-20261008.pdf",
+    "observed": "公告确认9月28—30日三日偏离超过30%，9月16—30日连续10交易日累计涨幅偏离达到100%。",
+    "verified": "9月16—30日的交易日计数为10：16、17、18、21、22、23、24、28、29、30。9月25日中秋休市，周末不计。",
+    "calendarSourceUrl": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20251222_10802507.shtml",
+    "recalculationStatus": "仅复核日历和公告事件，未复算精确偏离值",
+    "missing": "完整官方每日证券收盘价、科创50点位、除权信息和精确公布偏离值，不能区分日偏离求和与区间收益差。"
+  },
+  {
+    "id": "chinext-shangshui-20260930",
+    "code": "301513",
+    "name": "尚水智能",
+    "announcementDate": "2026-09-30",
+    "announcementNumber": "2026-044",
+    "sourceUrl": "https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-09-30/7b11da00-9ca1-42bd-a531-0a8f5d236dcb.PDF",
+    "sourceFile": "rule-sources/case-szse-shangshui-20260930.pdf",
+    "observed": "9月29日、30日连续两个交易日涨幅偏离累计30%以上，属于异常波动。",
+    "verified": "三日内标准可以不足三日达到，计算器不应硬性要求三条日线才允许触发。",
+    "recalculationStatus": "事件及两日窗口已经核对，数值未复算",
+    "missing": "原始行情、创业板综合指数点位和精确偏离数值。"
+  },
+  {
+    "id": "star-qingyue-20260910",
+    "code": "688496",
+    "name": "*ST清越",
+    "announcementDate": "2026-09-11",
+    "announcementNumber": "2026-097",
+    "sourceUrl": "https://static.cninfo.com.cn/finalpage/2026-09-11/1225558620.PDF",
+    "sourceFile": "rule-sources/case-star-qingyue-20260911.pdf",
+    "observed": "科创板风险警示股票在9月8—10日三日跌幅偏离累计达到30%，被公告为异常波动，末日收盘0.58元。",
+    "verified": "风险警示名称不意味着适用主板三日20%或旧12%门槛。",
+    "recalculationStatus": "状态、板块和公告门槛已核对，数值未复算",
+    "missing": "全量官方日收盘、除权数据及基准指数点位。"
+  },
+  {
+    "id": "star-yunzhong-suspension-2026",
+    "code": "688260",
+    "name": "昀冢科技",
+    "announcementDate": "2026-07-01",
+    "announcementNumber": "2026-039、2026-042",
+    "sourceUrl": "https://static.cninfo.com.cn/finalpage/2026-07-01/1225401109.PDF",
+    "suspensionSourceUrl": "https://static.cninfo.com.cn/finalpage/2026-06-26/1225388995.PDF",
+    "sourceFile": "rule-sources/case-star-yunzhong-resume-20260701.pdf",
+    "suspensionStart": "2026-06-26",
+    "suspensionEnd": "2026-06-30",
+    "resumeDate": "2026-07-01",
+    "observed": "6月26日起停牌核查，7月1日复牌；公告披露5月7日至6月30日证券区间累计涨幅277.95%，科创50同期31.51%。",
+    "arithmeticCheck": "277.95-31.51=246.44个百分点；停牌涉及6月26、29、30三个交易日。",
+    "recalculationStatus": "停复牌事件与公告区间涨幅差可核对，但不是10/30日累计偏离公式验收案例",
+    "missing": "公告没有给出复牌前后3/10/30日完整窗口回放，不能由此确认所有普通停牌跳日或重置口径。"
+  }
+]

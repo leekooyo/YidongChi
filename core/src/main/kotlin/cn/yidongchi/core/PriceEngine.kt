@@ -7,9 +7,9 @@ import java.time.LocalDate
 object PriceEngine {
     private val one=BigDecimal.ONE
     fun deviation(bars:List<Bar>, index:List<Bar>):BigDecimal =
-        growth(bars).subtract(growth(index))
+        (ExactRatio.growth(bars)-ExactRatio.growth(index)).decimal()
 
-    fun growth(bars:List<Bar>):BigDecimal = bars.fold(one) { acc,bar -> acc.multiply(bar.close.ratio(bar.previousClose),MC) }
+    fun growth(bars:List<Bar>):BigDecimal = ExactRatio.growth(bars).decimal()
 
     fun tick(value:BigDecimal,unit:BigDecimal,round:RoundingMode):BigDecimal = value.divide(unit,0,round).multiply(unit)
 
@@ -17,8 +17,8 @@ object PriceEngine {
         tick(base.multiply(indexGrowth.add(target),MC),unit,if(direction==Direction.UP) RoundingMode.CEILING else RoundingMode.FLOOR)
 
     fun limits(stock:Stock,previous:BigDecimal):Pair<BigDecimal,BigDecimal> =
-        tick(previous.multiply(one.subtract(stock.board.limit)),stock.tick,RoundingMode.HALF_UP).max(stock.tick) to
-            tick(previous.multiply(one.add(stock.board.limit)),stock.tick,RoundingMode.HALF_UP)
+        tick(previous.multiply(one.subtract(stock.board.limit)),stock.tick,RoundingMode.HALF_UP).min(previous.subtract(stock.tick)).max(stock.tick) to
+            tick(previous.multiply(one.add(stock.board.limit)),stock.tick,RoundingMode.HALF_UP).max(previous.add(stock.tick))
 
     fun analyze(stock:Stock,bars:List<Bar>,index:List<Bar>,targetDate:LocalDate,indexPrice:BigDecimal,resets:ResetDates=ResetDates()):Analysis {
         val currentBar=bars.last {it.date==targetDate}
@@ -33,20 +33,22 @@ object PriceEngine {
             for(length in 1..minOf(days,history.size)) {
                 val window=history.takeLast(length)
                 if(window.any {!it.eligible||it.date !in indexByDate} || (reset!=null&&window.first().date<reset)) continue
-                val ix=window.map { indexByDate.getValue(it.date) }.toMutableList()
+                val ix=index.filter {it.date>=window.first().date&&it.date<=targetDate}.sortedBy {it.date}.toMutableList()
                 ix[ix.lastIndex]=ix.last().copy(close=indexPrice)
-                val beforeGrowth=growth(window.dropLast(1))
-                val base=currentBar.previousClose.ratio(beforeGrowth)
-                val indexGrowth=growth(ix)
-                val deviation=deviation(window,ix)
+                val beforeGrowth=ExactRatio.growth(window.dropLast(1))
+                val base=ExactRatio.from(currentBar.previousClose)/beforeGrowth
+                val indexGrowth=ExactRatio.growth(ix)
+                val exactDeviation=ExactRatio.growth(window)-indexGrowth
+                val deviation=exactDeviation.decimal()
                 val up=when(ruleId) {"normal"->stock.board.normal;"severe10"->one;else->"2".bd()}
                 val down=when(ruleId) {"normal"->stock.board.normal.negate();"severe10"->"-.50".bd();else->"-.70".bd()}
                 for((direction,target) in listOf(Direction.UP to up,Direction.DOWN to down)) {
-                    val price=threshold(base,indexGrowth,target,stock.tick,direction)
+                    val raw=base*(indexGrowth+ExactRatio.from(target))
+                    val price=raw.quote(stock.tick,direction)
                     if(price<stock.tick && direction==Direction.DOWN) continue
                     val reachable=if(direction==Direction.UP)price<=upper else price>=lower
-                    val satisfied=if(direction==Direction.UP)deviation>=target else deviation<=target
-                    candidates+=PriceLevel(ruleId,when(ruleId){"normal"->"3日异常";"severe10"->"10日严重异动";else->"30日严重异动"},direction,window.first().date,targetDate,length,price,base.multiply(indexGrowth.add(target),MC),deviation,target,reachable,satisfied)
+                    val satisfied=if(direction==Direction.UP)exactDeviation>=ExactRatio.from(target) else exactDeviation<=ExactRatio.from(target)
+                    candidates+=PriceLevel(ruleId,when(ruleId){"normal"->"3日异常";"severe10"->"10日严重异动";else->"30日严重异动"},direction,window.first().date,targetDate,length,price,raw.decimal(),deviation,target,reachable,satisfied)
                 }
             }
             for(direction in Direction.entries) {

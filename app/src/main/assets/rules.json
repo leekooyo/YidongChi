@@ -1,0 +1,838 @@
+[
+  {
+    "id": "sse-main-3d",
+    "title": "沪市主板：三日内异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "异常波动",
+    "summary": "连续3个交易日内收盘涨跌幅偏离累计达到±20%；包括不足3日即达到的情形。重置依赖交易所公布或复牌事件，不能机械要求必须满3日。",
+    "article": "5.4.2、5.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-10d",
+    "title": "沪市主板：十日严重异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内收盘涨跌幅偏离累计达到+100%或-50%；达到含边界。",
+    "article": "5.4.2、5.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-30d",
+    "title": "沪市主板：三十日严重异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续30个交易日内收盘涨跌幅偏离累计达到+200%或-70%；达到含边界。",
+    "article": "5.4.2、5.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-repeat",
+    "title": "沪市主板：同向异常次数",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内4次同向异常波动；应使用异常事件及其有效日期，不能把每个重叠三日窗口都算成独立次数。其他交易所认定情形仍可能成立。",
+    "article": "5.4.2、5.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-3d",
+    "title": "科创板：三日内异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "异常波动",
+    "summary": "连续3个交易日内收盘涨跌幅偏离累计达到±30%；包括不足3日即达到的情形。重置依赖交易所公布或复牌事件，不能机械要求必须满3日。",
+    "article": "6.10、6.11",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-10d",
+    "title": "科创板：十日严重异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内收盘涨跌幅偏离累计达到+100%或-50%；达到含边界。",
+    "article": "6.10、6.11",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-30d",
+    "title": "科创板：三十日严重异常波动",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续30个交易日内收盘涨跌幅偏离累计达到+200%或-70%；达到含边界。",
+    "article": "6.10、6.11",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-repeat",
+    "title": "科创板：同向异常次数",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内3次同向异常波动；应使用异常事件及其有效日期，不能把每个重叠三日窗口都算成独立次数。其他交易所认定情形仍可能成立。",
+    "article": "6.10、6.11",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-3d",
+    "title": "深市主板：三日内异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "异常波动",
+    "summary": "连续3个交易日内收盘涨跌幅偏离累计达到±20%；包括不足3日即达到的情形。重置依赖交易所公布或复牌事件，不能机械要求必须满3日。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-10d",
+    "title": "深市主板：十日严重异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内收盘涨跌幅偏离累计达到+100%或-50%；达到含边界。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-30d",
+    "title": "深市主板：三十日严重异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续30个交易日内收盘涨跌幅偏离累计达到+200%或-70%；达到含边界。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-repeat",
+    "title": "深市主板：同向异常次数",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内4次同向异常波动；应使用异常事件及其有效日期，不能把每个重叠三日窗口都算成独立次数。其他交易所认定情形仍可能成立。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-chinext-3d",
+    "title": "创业板：三日内异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "异常波动",
+    "summary": "连续3个交易日内收盘涨跌幅偏离累计达到±30%；包括不足3日即达到的情形。重置依赖交易所公布或复牌事件，不能机械要求必须满3日。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-chinext-10d",
+    "title": "创业板：十日严重异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内收盘涨跌幅偏离累计达到+100%或-50%；达到含边界。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-chinext-30d",
+    "title": "创业板：三十日严重异常波动",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续30个交易日内收盘涨跌幅偏离累计达到+200%或-70%；达到含边界。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-chinext-repeat",
+    "title": "创业板：同向异常次数",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "严重异常波动",
+    "summary": "连续10个交易日内3次同向异常波动；应使用异常事件及其有效日期，不能把每个重叠三日窗口都算成独立次数。其他交易所认定情形仍可能成立。",
+    "article": "5.4.3、5.4.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-formula",
+    "title": "沪主板：累计偏离公式",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "计算口径",
+    "summary": "累计偏离=证券期末/期初前收盘价收益率－同期指数收益率；期间除权除息须调整收盘价。非每日偏离简单加总。",
+    "article": "5.4.2第一项",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-formula",
+    "title": "深主板、创业板：累计偏离公式",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "计算口径",
+    "summary": "累计偏离=证券期末/期初前收盘价收益率－同期指数收益率；期间除权除息须调整收盘价。此公式在三日异常条款中明确列出。",
+    "article": "5.4.3第一项",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "star-formula-question",
+    "title": "科创板：累计公式解释待补证",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "计算口径",
+    "summary": "6.12明确每日证券涨跌幅减科创50；经6.1援引一般5.4.2端点公式存在解释依据，但本轮未取得完整可复算官方案例直接确认累计口径，不能标作已验证。",
+    "article": "6.1、6.10、6.12及5.4.2",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "文件已定位，细节待核验"
+  },
+  {
+    "id": "sse-base",
+    "title": "沪市：基准指数",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板",
+      "沪市B股"
+    ],
+    "category": "基准指数",
+    "summary": "主板A股对应上证A股指数、B股对应上证B股指数；科创板对应上证科创板50成份指数。不可用上证综指替代上证A股指数。",
+    "article": "5.4.1、6.12",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-base",
+    "title": "深市：基准指数",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板",
+      "深市B股"
+    ],
+    "category": "基准指数",
+    "summary": "主板A股对应深证A股指数，创业板对应创业板综合指数，B股对应深证B股指数；不可分别替换为深证成指、创业板指。",
+    "article": "5.4.1",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-st",
+    "title": "沪市：风险警示股票当前标准",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "风险警示",
+    "summary": "2026-07-06起主板风险警示涨跌幅10%、三日异常偏离±20%；科创板风险警示仍按科创板20%涨跌幅及±30%异常标准。旧5%/±12%不作当前默认。",
+    "article": "3.3.13、4.4、5.4.2、6.6、6.10",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-st",
+    "title": "深市：风险警示股票当前标准",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "风险警示",
+    "summary": "2026-07-06起主板风险警示涨跌幅10%、三日异常偏离±20%；创业板风险警示按20%涨跌幅及±30%异常标准。",
+    "article": "3.3.13、5.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-reset",
+    "title": "沪市：指标重置与无限制日",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "窗口与重置",
+    "summary": "相关指标自交易所公布的次一交易日或复牌日起重新计算；无涨跌幅限制股票不纳入异常及严重异常指标。普通停牌是否影响各窗口天数仍需专门案例，不能把所有复牌都当成重置。",
+    "article": "5.4.2、5.4.3、5.4.5、6.10—6.12",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-reset",
+    "title": "深市：指标重置与退市整理排除",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "窗口与重置",
+    "summary": "异常及严重异常指标自交易所公布的次一交易日或复牌日起重新计算；无涨跌幅限制股票及退市整理期间不纳入相关指标。普通停牌窗口口径待补案例。",
+    "article": "4.5.6、5.4.5",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-nolimit",
+    "title": "沪市：无涨跌幅限制情形",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "交易限制",
+    "summary": "主板IPO前5交易日、重新上市首日、退市整理首日等例外；科创板IPO前5日、退市整理首日等例外。无涨跌幅限制不等于没有盘中临停和有效申报约束。",
+    "article": "3.3.13、6.6",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-nolimit",
+    "title": "深市：无涨跌幅限制情形",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "交易限制",
+    "summary": "IPO上市前5交易日、退市整理首日、重新上市首日及交易所认定情形不实行涨跌幅限制；应使用上市、退市、重新上市状态，而非仅凭简称或价格推断。",
+    "article": "3.3.15",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-price-round",
+    "title": "沪市：涨跌停价与最小价格单位",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板",
+      "沪市B股"
+    ],
+    "category": "交易限制",
+    "summary": "涨跌幅限制价=前收盘价×(1±限制比例)，按最小变动单位四舍五入；需一并处理除权除息、低价及最小变动单位，不能直接对百分比截图反推涨停价。",
+    "article": "3.3.11、3.3.13、3.3.17、4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-price-round",
+    "title": "深市：涨跌停价与除权基准",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板",
+      "深市B股"
+    ],
+    "category": "交易限制",
+    "summary": "涨跌幅限制价=前收盘价×(1±限制比例)，按最小变动单位处理；A股0.01元、B股0.01港元；除权息日以除权息参考价作为计算涨跌幅基准。",
+    "article": "3.3.11、3.3.14、4.4.2—4.4.3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-turnover",
+    "title": "沪主板：换手率异常条件",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "换手率",
+    "summary": "连续3日平均换手率/前5日平均换手率达到30倍，并且3日累计换手率达到20%。两条件同时满足；需成交量及无限售流通股数据。",
+    "article": "5.4.2第二项",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-turnover",
+    "title": "深主板：换手率异常条件",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "换手率",
+    "summary": "连续3日平均换手率/前5日平均换手率达到30倍，并且3日累计换手率达到20%。该项不适用于创业板。",
+    "article": "5.4.3第二项",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-daily",
+    "title": "沪市：单日公开交易信息标准",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "交易公开信息",
+    "summary": "主板偏离±7%、振幅15%、换手20%；科创板涨跌幅±15%、振幅30%、换手30%。各前5只等排名条件仍需全市场比较，达到门槛不等于自动上榜。",
+    "article": "5.4.1、6.9",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-daily",
+    "title": "深市：单日公开交易信息标准",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "交易公开信息",
+    "summary": "主板偏离±7%、振幅15%、换手20%；创业板涨跌幅±15%、振幅30%、换手30%。存在前5名排名要求；证券涨跌停时单日涨跌幅取对应限制比例。",
+    "article": "5.4.1",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-monitor",
+    "title": "沪主板监控细则：交易行为监管",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "异常交易行为",
+    "summary": "涵盖虚假申报、拉抬打压、维持涨跌停价、自买自卖/关联账户对手交易、严重异常后申报速率异常；涉及账户、订单与全市场占比，不能仅用公开日线判断全部违规。",
+    "article": "第6—9、10—29条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20250519_10779397.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-monitor-10d",
+    "title": "沪主板监控细则：严重异常后的十日",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "事后监控",
+    "summary": "严重异常后10交易日，连续竞价1分钟单向申报金额巨大受重点监控。第33条定义风险警示金额200万元以上、其他股票1000万元以上；含本数。监控期提示与价格触发窗口须分开。",
+    "article": "第27—29、33条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20250519_10779397.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-monitor",
+    "title": "科创板监控细则：交易行为监管",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "异常交易行为",
+    "summary": "涵盖虚假申报、拉抬打压、维持涨跌停价、自买自卖/关联账户对手交易、严重异常后申报速率异常；涉及账户、订单与全市场占比，不能仅用公开日线判断全部违规。",
+    "article": "第6—9、10—29条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20250519_10779400.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-monitor-10d",
+    "title": "科创板监控细则：严重异常后的十日",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "事后监控",
+    "summary": "严重异常后10交易日，连续竞价1分钟单向申报金额巨大受重点监控。第33条定义风险警示金额200万元以上、其他股票1000万元以上；含本数。监控期提示与价格触发窗口须分开。",
+    "article": "第27—29、33条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20250519_10779400.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-monitor",
+    "title": "深主板监控细则：交易行为监管",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "异常交易行为",
+    "summary": "涵盖虚假申报、拉抬打压、维持涨跌停价、自买自卖/关联账户对手交易、严重异常后申报速率异常；涉及账户、订单与全市场占比，不能仅用公开日线判断全部违规。",
+    "article": "第6—9、10—29条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/stock/W020230217570611262391.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-monitor-10d",
+    "title": "深主板监控细则：严重异常后的十日",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "事后监控",
+    "summary": "严重异常后10交易日，连续竞价1分钟单向申报金额巨大受重点监控。第33条定义风险警示金额200万元以上、其他股票1000万元以上；含本数。监控期提示与价格触发窗口须分开。",
+    "article": "第27—29、33条",
+    "effectiveDate": "首只注册制主板股票上市日起；发布2023-02-17",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/stock/W020230217570611262391.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "chinext-monitor",
+    "title": "创业板监控细则（试行）（2023年修订）",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "异常交易行为",
+    "summary": "严重异常后10交易日，连续竞价1分钟单向申报金额超过1000万元受重点监控；此处为超过，不含1000万元本数。还包括虚假申报、拉抬打压、维持涨跌停、自买自卖/关联账户等行为。",
+    "article": "第6—26条，特别是24—26条",
+    "effectiveDate": "2023年修订；具体生效链待补核",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/allrules/bussiness/W020250327502095568538.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-main-listing",
+    "title": "沪主板上市规则（2026年4月修订）",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板"
+    ],
+    "category": "披露与核查",
+    "summary": "异常波动应按规定披露公告；严重异常应于次一交易日披露核查，无法披露则申请停牌核查。交易所可视情况实施停牌；价格触及门槛不能直接输出必然停牌。",
+    "article": "7.1.1—7.1.6",
+    "effectiveDate": "2026-04-24（部分治理条款另有过渡）",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20260424_10816589.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-star-listing",
+    "title": "科创板上市规则（2026年4月修订）",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "披露与核查",
+    "summary": "异常波动应按规定披露公告；严重异常应于次一交易日披露核查，无法披露则申请停牌核查。交易所可视情况实施停牌；价格触及门槛不能直接输出必然停牌。",
+    "article": "9.1.1—9.1.5",
+    "effectiveDate": "2026-04-24（部分治理条款另有过渡）",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/staripo/c/c_20260424_10816592.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-main-listing",
+    "title": "深主板上市规则（2026年修订）",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板"
+    ],
+    "category": "披露与核查",
+    "summary": "异常波动应按规定披露公告；严重异常应于次一交易日披露核查，无法披露则申请停牌核查。交易所可视情况实施停牌；价格触及门槛不能直接输出必然停牌。",
+    "article": "7.1.1—7.1.5",
+    "effectiveDate": "2026-04-24（部分治理条款另有过渡）",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/stock/W020260424747613955674.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-chinext-listing",
+    "title": "创业板上市规则（2026年修订）",
+    "exchange": "深交所",
+    "boards": [
+      "创业板"
+    ],
+    "category": "披露与核查",
+    "summary": "异常波动应按规定披露公告；严重异常应于次一交易日披露核查，无法披露则申请停牌核查。交易所可视情况实施停牌；价格触及门槛不能直接输出必然停牌。",
+    "article": "8.1.1—8.1.4",
+    "effectiveDate": "2026-04-24（部分治理条款另有过渡）",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/stock/supervision/chinext/W020260424688875101057.pdf",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-suspension",
+    "title": "沪市停复牌指引（2025年3月修订）",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "停复牌",
+    "summary": "依适用事项申请或由交易所实施停复牌；不得仅以事项结果不确定为由申请停牌。不能从本指引推导普通停牌会清除全部历史异动。",
+    "article": "第2—7条及相关分章",
+    "effectiveDate": "2025-03-28",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250516_10779127.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-suspension",
+    "title": "深市停复牌指引及2025修订",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "停复牌",
+    "summary": "已定位2023正文及2025-03-28深证上〔2025〕223号修改通知。须合并修订后适用；具体异常波动窗口计数未由该通知直接确认。",
+    "article": "指引第2—8条及2025修改附件",
+    "effectiveDate": "2025-03-28",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.szse.cn/lawrules/rule/all/t20250328_612605.html",
+    "status": "文件已定位，细节待核验"
+  },
+  {
+    "id": "sse-deferred",
+    "title": "沪市2026交易规则暂缓实施附件",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "生效与历史",
+    "summary": "暂缓内容集中于部分大宗交易均价申报和16—17时申报、交收；本轮所核主板ST涨跌幅与异常波动门槛不在暂缓清单。",
+    "article": "发布通知第二项、附件3",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-riskguide",
+    "title": "深市风险警示板交易业务指南（2026修订）",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "风险警示",
+    "summary": "发布通知要求7月6日起首次开通权限签新版风险揭示书；既有投资者须被告知主板风险警示涨跌幅调整。附件已存档。",
+    "article": "深证会〔2026〕261号及附件",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.szse.cn/lawrules/service/member/t20260630_621404.html",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-old2023",
+    "title": "沪市2023版交易规则（已失效）",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "生效与历史",
+    "summary": "仅供历史研究：旧主板风险警示三日±12%规则不能用于2026-07-06后的当前计算。2023版于2026-07-06被2026版废止；更早版本及跨生效日窗口待补核。",
+    "article": "旧4.4.11、5.4.2及2026版11.9",
+    "effectiveDate": "2023版至2026-07-05；历史起始和衔接待核",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/repeal/rules/c/c_20250612_10824490.shtml",
+    "status": "文件已定位，细节待核验"
+  },
+  {
+    "id": "star-index-history",
+    "title": "科创板基准指数历史切换通知（已失效）",
+    "exchange": "上交所",
+    "boards": [
+      "科创板"
+    ],
+    "category": "生效与历史",
+    "summary": "已定位2020年科创50切换通知；现行基准直接见2026规则6.12。不能将现行科创50直接回填开板初期；完整切换窗口待核。",
+    "article": "历史指数通知与现行6.12",
+    "effectiveDate": "历史2020年；完整衔接待核",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://big5.sse.com.cn/site/cht/www.sse.com.cn/lawandrules/sselawsrules2025/repeal/rules/c/c_20200619_10785119.shtml",
+    "status": "文件已定位，细节待核验"
+  },
+  {
+    "id": "calendar-2026",
+    "title": "2026年中秋国庆交易日历",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "交易日历",
+    "summary": "2026-09-25至09-27中秋休市，09-28复市；2026-09-16至09-30实际含10个交易日。不能把周一至周五全部当作交易日。",
+    "article": "2026年中秋节、国庆节休市公告",
+    "effectiveDate": "2026年对应假期",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/announcement/general/c/c_20260915_10832273.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "calendar-2026-full",
+    "title": "2026年全年官方休市安排",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "交易日历",
+    "summary": "元旦1/1—3；春节2/15—23；清明4/4—6；劳动5/1—5；端午6/19—21；中秋9/25—27；国庆10/1—7。调休工作周末仍休市；10/8开市。",
+    "article": "上证公告〔2025〕45号第一部分",
+    "effectiveDate": "2026年度",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20251222_10802507.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "sse-intraday",
+    "title": "上交所：无涨跌幅限制日盘中临停",
+    "exchange": "上交所",
+    "boards": [
+      "沪市主板",
+      "科创板"
+    ],
+    "category": "盘中临停",
+    "summary": "无涨跌幅限制股票盘中成交价相对当日开盘价首次上涨或下跌达到/超过30%、60%时临停，单次10分钟；跨14:57按规则于14:57复牌。另有交易所认定及调整权限，实际时间以公告为准。",
+    "article": "4.2.4—4.2.5",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/exchange/c/c_20260424_10816482.shtml",
+    "status": "关键条款已核验"
+  },
+  {
+    "id": "szse-intraday",
+    "title": "深交所：无涨跌幅限制日盘中临停",
+    "exchange": "深交所",
+    "boards": [
+      "深市主板",
+      "创业板"
+    ],
+    "category": "盘中临停",
+    "summary": "无涨跌幅限制股票盘中成交价相对当日开盘价首次上涨或下跌达到/超过30%、60%时临停，单次10分钟；跨14:57按规则于14:57复牌。另有交易所认定及调整权限，实际时间以公告为准。",
+    "article": "4.3.4",
+    "effectiveDate": "2026-07-06",
+    "verifiedDate": "2026-11-09",
+    "sourceUrl": "https://docs.static.szse.cn/www/lawrules/rule/trade/W020260424690713155663.pdf",
+    "status": "关键条款已核验"
+  }
+]

@@ -54,4 +54,19 @@ class PriceEngineTest {
         assertTrue(level.satisfied)
         assertTrue(level.reachable)
     }
+    @Test fun intervalIndexIncludesSuspensionGapSessions() {
+        val bars=listOf(bar(-2,"11","10"),bar(0,"12","11"))
+        val ix=listOf(bar(-2,"100","100"),bar(-1,"110","100"),bar(0,"110","110"))
+        val a=PriceEngine.analyze(stock,bars,ix,day,"110".bd())
+        assertEquals("13.00",a.levels.first{it.ruleId=="normal"&&it.direction==Direction.UP}.price.toPlainString())
+    }
+    @Test fun limitDiffCannotBeSmallerThanOneTick() {
+        assertEquals("0.02",PriceEngine.limits(stock,".01".bd()).second.toPlainString())
+    }
+    @Test fun recurringDivisionCannotMoveTriggerByOneTick() {
+        val bars=listOf(bar(-1,"5.11","5.05"),bar(0,"5.11","5.11"))
+        val ix=bars.map {it.copy(close="100".bd(),previousClose="100".bd())}
+        val a=PriceEngine.analyze(stock,bars,ix,day,"100".bd())
+        assertEquals("6.06",a.levels.first{it.ruleId=="normal"&&it.direction==Direction.UP}.price.toPlainString())
+    }
 }
