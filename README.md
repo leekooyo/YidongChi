@@ -113,4 +113,4 @@ docs/superpowers/           设计与实现计划
 - [明日异动池验收](docs/明日异动池验收.md)
 - [规则覆盖与依据](docs/规则覆盖与依据.md)
 - [0.1.1价格对照与修复](docs/2026-11-09-v011-修复与价格对照.md)
-- [开发目录迁移](docs/开发目录迁移.md)：本机主开发目录 `D:\Projects\YidongChi`，SDK与Gradle位于 `D:\AndroidDev`；旧工程和临时产物已清理，版本回退使用Git历史与Release。
+- [开发目录迁移](docs/开发目录迁移.md)：本机主开发目录 `D:\Projects\YidongChi`，SDK与Gradle位于 `D:\AndroidDev`；冗余产物已移出工作目录并暂存待清理，版本回退使用Git历史与Release。
