@@ -17,8 +17,8 @@ import java.time.LocalDate
 @Composable fun CalculationScreen(state:AppState) {
     val context=LocalContext.current
     val s=state.snapshots[state.selected]
-    var nextDay by remember(state.calculationRequest) {mutableStateOf(state.calculationRequest>0)}
-    var indexChange by remember(state.selected,state.calculationRequest){mutableStateOf(state.store.value("index-${state.selected}","0"))}
+    var nextDay by state.workspaces.calculation.flag("next-day")
+    var indexChange by state.workspaces.calculation.text("index","0","index-${state.selected}")
     var expanded by remember {mutableStateOf<PriceLevel?>(null)}
     var resetEditor by remember {mutableStateOf(false)}
     var indexEditor by remember {mutableStateOf(false)}

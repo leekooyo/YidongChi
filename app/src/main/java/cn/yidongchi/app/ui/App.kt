@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,10 +86,10 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
 }
 @Composable fun Note(text:String,color:Color=MaterialTheme.colorScheme.onSurfaceVariant) {Text(text,fontSize=14.sp,color=color,lineHeight=21.sp)}
 @Composable fun Pill(text:String,color:Color=Accent) {Surface(shape=RoundedCornerShape(8.dp),color=color.copy(alpha=.12f)){Text(text,Modifier.padding(horizontal=8.dp,vertical=4.dp),fontSize=13.sp,color=color)}}
-@Composable fun SearchBox(state:AppState,onOpen:(String)->Unit) {
-    Column {OutlinedTextField(state.searchText,{state.search(it)},Modifier.fillMaxWidth(),label={Text("股票代码 / 名称 / 粘贴内容")},leadingIcon={Icon(Icons.Outlined.Search,null)},singleLine=true,shape=RoundedCornerShape(16.dp))
-        state.suggestions.forEach {s->Row(Modifier.fillMaxWidth().clickable {state.searchText="";state.search("");onOpen(s.symbol)}.padding(12.dp),verticalAlignment=Alignment.CenterVertically){Text(s.name,Modifier.weight(1f));Text(s.code);IconButton(onClick={state.add(s)}){Icon(Icons.Outlined.Add,"加入自选")}}}
-        if(state.searchText.isBlank()&&state.history.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)){state.history.forEach {s->SuggestionChip(onClick={onOpen(s)},label={Text(s.drop(2))})}}
+@Composable fun SearchBox(state:AppState,onOpen:(String)->Unit,workspace:StockWorkspace=state.workspaces.calculation) {
+    Column {OutlinedTextField(workspace.searchText,{state.search(it,workspace)},Modifier.fillMaxWidth().testTag("stock-search-${workspace.key}"),label={Text(when(workspace.key){"forecast"->"推演股票代码 / 名称";"warnings"->"预警股票代码 / 名称";else->"股票代码 / 名称 / 粘贴内容"})},leadingIcon={Icon(Icons.Outlined.Search,null)},singleLine=true,shape=RoundedCornerShape(16.dp))
+        workspace.suggestions.forEach {s->Row(Modifier.fillMaxWidth().clickable {state.search("",workspace);onOpen(s.symbol)}.padding(12.dp),verticalAlignment=Alignment.CenterVertically){Text(s.name,Modifier.weight(1f));Text(s.code);IconButton(onClick={state.add(s)}){Icon(Icons.Outlined.Add,"加入自选")}}}
+        if(workspace.searchText.isBlank()&&workspace.history.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)){workspace.history.forEach {s->SuggestionChip(onClick={onOpen(s)},label={Text(s.drop(2))})}}
     }
 }
 @Composable fun SnapshotHeader(state:AppState,s:MarketSnapshot) {

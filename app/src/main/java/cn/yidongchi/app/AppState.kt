@@ -13,38 +13,37 @@ import java.time.LocalDate
 
 class AppState(app:Application):AndroidViewModel(app) {
     val store=LocalStore(app)
+    val workspaces=StockWorkspaces(store::value,store::put)
     private val repository=MarketRepository()
     var watches by mutableStateOf(store.watchlist());private set
-    var selected by mutableStateOf(store.value("selected","sh600000"));private set
+    val selected get()=workspaces.calculation.symbol
     val snapshots=mutableStateMapOf<String,MarketSnapshot>()
     val errors=mutableStateMapOf<String,String>()
-    var suggestions by mutableStateOf(emptyList<Stock>());private set
     var busy by mutableStateOf(false);private set
     var message by mutableStateOf("")
     var events by mutableStateOf(store.events());private set
-    var eventStatus by mutableStateOf("尚未加载记录");private set
+    val eventStatuses=mutableStateMapOf<String,String>()
     var alerts by mutableStateOf(emptyList<AlertItem>());private set
     var theme by mutableStateOf(store.value("theme","system"));private set
     var large by mutableStateOf(store.value("large","false")=="true");private set
     var threshold by mutableStateOf(store.value("threshold","1"));private set
-    var searchText by mutableStateOf("")
     var group by mutableStateOf(store.value("group","全部"))
     var sort by mutableStateOf(store.value("sort","置顶"))
     var filter by mutableStateOf("全部")
-    var history by mutableStateOf(store.value("recent").split('|').filter {it.isNotBlank()});private set
+    var warningsAll by mutableStateOf(store.value("warnings-all","false")=="true");private set
     var active by mutableStateOf(true)
     private val poolRepository=PoolRepository(java.io.File(app.filesDir,"pool"))
     var poolBatch by mutableStateOf<PoolBatch?>(null)
     var poolRunning by mutableStateOf(false);private set
     var poolLoading by mutableStateOf(true);private set
     var poolError by mutableStateOf("");private set
-    var calculationRequest by mutableIntStateOf(0);private set
     private var poolJob:Job?=null
     private val loading=mutableSetOf<String>()
     private val eventsFetched=mutableSetOf<String>()
-    private var searchJob:Job?=null
+    private val searchJobs=mutableMapOf<String,Job>()
+    private val eventsLoading=mutableSetOf<String>()
     init {
-        store.cached(selected)?.let {snapshots[selected]=it};viewModelScope.launch {refresh()}
+        workspaces.all.map{it.symbol}.distinct().forEach{symbol->store.cached(symbol)?.let{snapshots[symbol]=it}};viewModelScope.launch {refresh()}
         viewModelScope.launch {try{poolBatch=withContext(Dispatchers.IO){poolRepository.cached()}}catch(e:Exception){if(e is CancellationException)throw e;poolError="上次扫描记录无法读取，请重新扫描"}finally{poolLoading=false}}
     }
     fun startPool(newBatch:Boolean=false,retry:Boolean=false) {
@@ -76,20 +75,36 @@ class AppState(app:Application):AndroidViewModel(app) {
     }
     fun pausePool(){poolJob?.cancel()}
     fun openPoolStock(symbol:String) {
-        store.put("index-$symbol","0");calculationRequest++;select(symbol)
+        select(symbol)
+        workspaces.calculation.flag("next-day").value=true
+        workspaces.calculation.text("index","0","index-$symbol").value="0"
     }
     fun setting(key:String,value:String) {store.put(key,value);when(key){"theme"->theme=value;"large"->large=value=="true";"threshold"->threshold=value}}
-    fun select(symbol:String) {
-        selected=symbol;store.put("selected",symbol)
-        history=(listOf(symbol)+history).distinct().take(8);store.put("recent",history.joinToString("|"))
-        store.cached(symbol)?.let {snapshots[symbol]=it};viewModelScope.launch {load(symbol);loadEvents()}
+    fun select(symbol:String,workspace:StockWorkspace=workspaces.calculation) {
+        workspace.select(symbol)
+        if(symbol !in snapshots)store.cached(symbol)?.let {snapshots[symbol]=it}
+        viewModelScope.launch {load(symbol)}
     }
-    fun search(text:String) {searchText=text;searchJob?.cancel();searchJob=viewModelScope.launch {delay(350);suggestions=if(text.isBlank())emptyList() else try {repository.search(text)} catch(e:Exception){if(e is CancellationException)throw e;emptyList()}}}
+    fun search(text:String,workspace:StockWorkspace=workspaces.calculation) {
+        workspace.query(text);searchJobs[workspace.key]?.cancel()
+        if(text.isBlank())return
+        searchJobs[workspace.key]=viewModelScope.launch {delay(350);val result=try{repository.search(text)}catch(e:Exception){if(e is CancellationException)throw e;emptyList()};workspace.acceptResults(text,result)}
+    }
+    fun setWarningScope(all:Boolean){warningsAll=all;store.put("warnings-all",all.toString())}
+    fun warningSymbols()=workspaces.warningSymbols(watches,warningsAll)
+    fun ensureWarningData(symbols:List<String>) {viewModelScope.launch {
+        val gate=Semaphore(3)
+        coroutineScope{symbols.distinct().map{symbol->launch{gate.withPermit{
+            if(symbol !in snapshots)load(symbol)
+            else if("$symbol-${snapshots.getValue(symbol).quote.time.toLocalDate()}" !in eventsFetched)loadEvents(symbol)
+        }}}.joinAll()}
+    }}
+    fun refreshStock(symbol:String){viewModelScope.launch{load(symbol)}}
     fun add(stock:Stock) {watches=Watchlist.merge(watches,listOf(WatchItem(stock.symbol,stock.name)));store.saveWatchlist(watches);message="已加入自选"}
     fun update(item:WatchItem) {watches=watches.map {if(it.symbol==item.symbol)item else it};store.saveWatchlist(watches)}
     fun remove(symbol:String) {watches=watches.filter {it.symbol!=symbol};store.saveWatchlist(watches)}
     fun move(symbol:String,offset:Int) {val list=watches.toMutableList();val i=list.indexOfFirst {it.symbol==symbol};val j=i+offset;if(i>=0&&j in list.indices){val item=list.removeAt(i);list.add(j,item);watches=list;store.saveWatchlist(watches)}}
-    suspend fun refresh() {if(busy)return;busy=true;try {val gate=Semaphore(3);coroutineScope {(listOf(selected)+watches.map {it.symbol}).distinct().map {launch {gate.withPermit {load(it)}}}.joinAll()}} finally {busy=false}}
+    suspend fun refresh() {if(busy)return;busy=true;try {val gate=Semaphore(3);coroutineScope {(workspaces.all.map{it.symbol}+watches.map {it.symbol}).distinct().map {launch {gate.withPermit {load(it)}}}.joinAll()}} finally {busy=false}}
     fun refreshNow() {viewModelScope.launch {refresh()}}
     private suspend fun load(symbol:String) {
         if(!loading.add(symbol))return
@@ -114,15 +129,17 @@ class AppState(app:Application):AndroidViewModel(app) {
     fun readAlert(a:AlertItem){store.put("read-${a.key}","true");alerts=alerts.map {if(it.key==a.key)it.copy(read=true) else it}}
     suspend fun loadEvents(symbol:String=selected) {
         val s=snapshots[symbol]?:return
-        if(symbol==selected)eventStatus="正在读取行情源记录"
-        try {val incoming=repository.eventCandidates(s.quote.stock);events=EventLogic.merge(events,incoming);store.saveEvents(events);eventsFetched+="$symbol-${s.quote.time.toLocalDate()}";if(symbol==selected)eventStatus="行情源候选记录已读取；不代表官方事件完整覆盖"
+        if(!eventsLoading.add(symbol))return
+        eventStatuses[symbol]="正在读取行情源记录"
+        try {val incoming=repository.eventCandidates(s.quote.stock);events=EventLogic.merge(events,incoming);store.saveEvents(events);eventsFetched+="$symbol-${s.quote.time.toLocalDate()}";eventStatuses[symbol]="行情源候选记录已读取；不代表官方事件完整覆盖"
             if(store.value("alert-event","true")=="true"&&watches.firstOrNull{it.symbol==symbol}?.muted!=true){val hits=s.recent(events).filter {it.confirmed&&it.kind!="normal"}.map {AlertItem("event-${it.symbol}-${it.date}-${it.kind}",symbol,"${s.quote.stock.name} 存在近期已确认严重异动记录 ${it.date}",it.date)};alerts=Watchlist.mergeAlerts(alerts,hits)}
-        }catch(e:Exception){if(e is CancellationException)throw e;if(symbol==selected)eventStatus="事件源暂不可用；未读取到不能视为没有异动"}
+        }catch(e:Exception){if(e is CancellationException)throw e;eventStatuses[symbol]="事件源暂不可用；未读取到不能视为没有异动"}
+        finally{eventsLoading.remove(symbol)}
     }
-    fun addEvent(date:String,kind:String,direction:Direction,url:String) {val d=LocalDate.parse(date);require(url.startsWith("https://")){"请填写原公告 HTTPS 链接"};events=events.filterNot {it.symbol==selected&&it.date==d&&it.kind==kind}+OfficialEvent("$selected-$d-$kind",selected,d,kind,direction,url,true);store.saveEvents(events);message="已按你核对的原公告保存"}
+    fun addEvent(date:String,kind:String,direction:Direction,url:String,symbol:String=workspaces.warnings.symbol) {val d=LocalDate.parse(date);require(url.startsWith("https://")){"请填写原公告 HTTPS 链接"};events=events.filterNot {it.symbol==symbol&&it.date==d&&it.kind==kind}+OfficialEvent("$symbol-$d-$kind",symbol,d,kind,direction,url,true);store.saveEvents(events);message="已按你核对的原公告保存"}
     fun recent(s:MarketSnapshot)=s.recent(events)
     fun import(text:String) {val count=store.import(text);watches=store.watchlist();theme=store.value("theme","system");large=store.value("large","false")=="true";threshold=store.value("threshold","1");message="备份已合并，共 $count 只自选"}
     fun undoImport(){if(store.undoImport()){watches=store.watchlist();theme=store.value("theme","system");large=store.value("large","false")=="true";threshold=store.value("threshold","1");message="已恢复导入前自选与设置"}else message="暂无可恢复备份"}
     fun historySnapshot(date:String):MarketSnapshot?=store.cached(selected,date)
-    fun clearHistory(){history=emptyList();store.put("recent","")}
+    fun clearHistory(){workspaces.clearHistory()}
 }

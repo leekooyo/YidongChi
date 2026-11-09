@@ -13,19 +13,22 @@ import cn.yidongchi.app.*
 import cn.yidongchi.core.*
 
 @Composable fun ForecastScreen(state:AppState) {
-    val s=state.snapshots[state.selected]
-    var stockChange by remember(state.selected){mutableStateOf(state.store.value("scenario-stock-${state.selected}","0"))}
-    var indexChange by remember(state.selected){mutableStateOf(state.store.value("scenario-index-${state.selected}","0"))}
-    var pathText by remember(state.selected){mutableStateOf("")}
-    var indexPath by remember(state.selected){mutableStateOf("")}
-    var mode by remember(state.selected){mutableStateOf("固定涨跌")}
-    var reset by remember {mutableStateOf(false)}
-    var compare by remember {mutableStateOf(false)}
+    val workspace=state.workspaces.forecast
+    val symbol=workspace.symbol
+    val s=state.snapshots[symbol]
+    var stockChange by workspace.text("stock","0","scenario-stock-$symbol")
+    var indexChange by workspace.text("index","0","scenario-index-$symbol")
+    var pathText by workspace.text("path")
+    var indexPath by workspace.text("index-path")
+    var mode by workspace.text("mode","固定涨跌")
+    var reset by workspace.flag("reset")
+    var compare by workspace.flag("compare")
     var advanced by remember {mutableStateOf(false)}
     var help by remember {mutableStateOf(false)}
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         Section("未来 10 个交易日"){}
-        if(s==null){Panel {Text("先选择股票")};return@Column}
+        SearchBox(state,{state.select(it,workspace)},workspace)
+        if(s==null){Panel {Text(state.errors[symbol]?:"正在读取该股票行情");Button(onClick={state.refreshStock(symbol)}){Text("重试")}};return@Column}
         SnapshotHeader(state,s)
         Panel {
             listOf(listOf("固定涨跌","连续涨停"),listOf("连续跌停","逐日路径")).forEach {row->
@@ -33,13 +36,13 @@ import cn.yidongchi.core.*
                     row.forEach {m->FilterChip(mode==m,{mode=m},modifier=Modifier.weight(1f),label={Text(m,fontSize=15.sp)})}
                 }
             }
-            if(mode=="固定涨跌"||mode=="逐日路径")OutlinedTextField(stockChange,{stockChange=it;state.store.put("scenario-stock-${state.selected}",it)},Modifier.fillMaxWidth(),label={Text("个股每日涨跌幅（%）")},singleLine=true)
+            if(mode=="固定涨跌"||mode=="逐日路径")OutlinedTextField(stockChange,{stockChange=it},Modifier.fillMaxWidth(),label={Text("个股每日涨跌幅（%）")},singleLine=true)
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                FilterChip(indexChange.toBigDecimalOrNull()?.signum()==0,{indexChange="0";state.store.put("scenario-index-${state.selected}","0")},label={Text("指数不变")})
+                FilterChip(indexChange.toBigDecimalOrNull()?.signum()==0,{indexChange="0"},label={Text("指数不变")})
                 TextButton(onClick={advanced=!advanced}){Text(if(advanced)"收起设置"else "更多条件")}
             }
             if(advanced||indexChange.toBigDecimalOrNull()?.signum()!=0) {
-                OutlinedTextField(indexChange,{indexChange=it;state.store.put("scenario-index-${state.selected}",it)},Modifier.fillMaxWidth(),label={Text("指数每日涨跌幅（%）")},singleLine=true)
+                OutlinedTextField(indexChange,{indexChange=it},Modifier.fillMaxWidth(),label={Text("指数每日涨跌幅（%）")},singleLine=true)
                 Row {Checkbox(reset,{reset=it});Text("触发后模拟重置",Modifier.padding(top=12.dp))}
                 Row {Checkbox(compare,{compare=it});Text("对比价格不变情景",Modifier.padding(top=12.dp))}
             }
@@ -48,8 +51,8 @@ import cn.yidongchi.core.*
                 OutlinedTextField(indexPath,{indexPath=it},Modifier.fillMaxWidth(),label={Text("指数路径：0,0.2,-0.1")})
             }
         }
-        val resets=state.resets(state.selected)
-        val events=state.events.filter{it.symbol==state.selected}
+        val resets=state.resets(symbol)
+        val events=state.events.filter{it.symbol==symbol}
         val result=remember(s,mode,stockChange,indexChange,pathText,indexPath,reset,resets,events) {
             runCatching {Projection.project(s.quote.stock,s.bars,s.indexBars,ForecastInputs.scenario(mode,stockChange,indexChange,pathText,indexPath,reset),resets=resets,events=events)}
         }

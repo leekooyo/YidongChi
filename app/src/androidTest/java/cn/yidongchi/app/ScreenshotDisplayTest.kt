@@ -26,6 +26,8 @@ class ScreenshotDisplayTest {
             state.store.put("normal-sz002086","")
             state.store.put("severe-sz002086","")
             state.select("sz002086")
+            state.workspaces.calculation.flag("next-day").value=false
+            state.workspaces.calculation.text("index","0").value="0"
         }
         ui.waitUntil(35_000){state.snapshots["sz002086"]?.quote?.stock?.name=="东方海洋"}
         ui.onNodeWithText("计算").performClick()

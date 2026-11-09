@@ -21,14 +21,16 @@ class ForecastModeTest {
         ui.waitUntil(35_000){!state.busy}
         ui.runOnIdle {
             state.active=false
-            val stock=Stock(state.selected,"测试股票",Watchlist.boardFor(state.selected))
+            val symbol=state.workspaces.forecast.symbol
+            val stock=Stock(symbol,"测试股票",Watchlist.boardFor(symbol))
             val dates=TradingCalendar.nextDays(java.time.LocalDate.parse("2026-09-21"),31)
             val bars=dates.map {Bar(it,"10".bd(),"10".bd())}
             val index=dates.map {Bar(it,"100".bd(),"100".bd())}
             val q=Quote(stock,"10".bd(),"10".bd(),LocalDateTime.of(dates.last(),java.time.LocalTime.of(15,0)),"10".bd(),"10".bd(),"11".bd(),"9".bd())
-            state.snapshots[state.selected]=MarketSnapshot(q,q.copy(price="100".bd(),previousClose="100".bd()),bars,index)
-            state.store.put("scenario-stock-${state.selected}","0")
-            state.store.put("scenario-index-${state.selected}","0")
+            state.snapshots[symbol]=MarketSnapshot(q,q.copy(price="100".bd(),previousClose="100".bd()),bars,index)
+            state.workspaces.forecast.text("stock","0").value="0"
+            state.workspaces.forecast.text("index","0").value="0"
+            state.workspaces.forecast.text("mode","固定涨跌").value="固定涨跌"
         }
         ui.onNodeWithText("推演").performClick()
         ui.onNode(hasSetTextAction() and hasText("个股每日涨跌幅（%）")).performScrollTo().performTextClearance()
