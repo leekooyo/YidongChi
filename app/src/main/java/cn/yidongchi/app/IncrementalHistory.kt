@@ -2,6 +2,7 @@ package cn.yidongchi.app
 
 import cn.yidongchi.core.*
 import java.time.LocalDate
+import java.time.LocalTime
 
 data class HistorySeries(val stock:Stock,val provider:String,val bars:List<Bar>)
 data class HistoryWrite(val series:HistorySeries,val replace:Boolean)
@@ -12,9 +13,10 @@ sealed interface HistoryDecision {
 }
 
 object IncrementalHistory {
+    fun closed(quote:Quote,date:LocalDate)=quote.time.toLocalDate()==date&&quote.time.toLocalTime()>=LocalTime.of(15,0)
     fun plan(series:HistorySeries?,quote:Quote,date:LocalDate,index:Boolean=false):HistoryDecision {
         if(!index&&quote.volume.signum()==0)return HistoryDecision.Excluded
-        require(quote.time.toLocalDate()==date){"收盘行情未就绪"}
+        require(closed(quote,date)){"收盘行情未就绪"}
         if(series==null||series.bars.isEmpty())return HistoryDecision.Repair
         if(!index&&series.bars.size<35&&series.stock.listedOn==null)return HistoryDecision.Repair
         val last=series.bars.last()

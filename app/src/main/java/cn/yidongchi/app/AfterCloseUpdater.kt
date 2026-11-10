@@ -48,7 +48,7 @@ class AfterCloseUpdater(private val source:AfterCloseSource,private val store:Po
             if(missing.isNotEmpty()) {
                 val incoming=source.quotes(missing)
                 // Only stage usable current quotes (or explicit no-trade rows). Missing/stale active rows retry on the next update.
-                val reusable=incoming.filter{(symbol,raw)->runCatching{val q=MarketParser.quote(symbol,raw);q.volume.signum()==0||q.time.toLocalDate()==date}.getOrDefault(noTrade(raw))}
+                val reusable=incoming.filter{(symbol,raw)->runCatching{val q=MarketParser.quote(symbol,raw);q.volume.signum()==0||IncrementalHistory.closed(q,date)}.getOrDefault(noTrade(raw))}
                 store.saveQuotes(date,reusable);saved.putAll(incoming)
             }
             progress("本地计算",batch)
@@ -61,11 +61,12 @@ class AfterCloseUpdater(private val source:AfterCloseSource,private val store:Po
                     if(noTrade(raw))throw PoolExcluded("停牌或暂无成交价")
                     val q=MarketParser.quote(stock.symbol,raw)
                     val old=store.history(stock.symbol)
-                    val plan=if(rebuild)HistoryDecision.Repair else IncrementalHistory.plan(old,q,date)
-                    if(plan is HistoryDecision.Excluded)throw PoolExcluded("停牌或当日无成交")
+                    val checked=IncrementalHistory.plan(old,q,date)
+                    if(checked is HistoryDecision.Excluded)throw PoolExcluded("停牌或当日无成交")
+                    val plan=if(rebuild)HistoryDecision.Repair else checked
                     val write=if(plan is HistoryDecision.Write)plan.value else {
                         repairs++;progress("补齐历史",batch)
-                        HistoryWrite(source.repair(stock,q,date),true)
+                        HistoryWrite(source.repair(old?.stock?:stock,q,date),true)
                     }
                     val series=IncrementalHistory.merge(old,write)
                     var ix=index(stock.board.indexSymbol,series.provider)

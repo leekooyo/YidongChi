@@ -9,6 +9,20 @@ import java.io.File
 import java.time.LocalDate
 
 class LegacyPoolImportTest {
+    @Test fun cachedCandidatesAreEmittedBeforeAnyHistoryImport()=runBlocking {
+        val directory=Files.createTempDirectory("visible-before-import").toFile()
+        val backing=MemoryHistoryStore();var shown=false
+        val s=Stock("sz002086","东方海洋",Board.SZ_MAIN)
+        val day=LocalDate.parse("2026-11-09")
+        val batch=PoolBatch(PoolBasis(day.atTime(15,1),emptyMap()),listOf(s),mapOf(s.symbol to PoolOutcome(excluded=true)))
+        File(directory,"batch.json").writeText(PoolCodec.encode(batch))
+        File(directory,"2026-11-09-tencent-sz002086.json").writeText("""{"data":{"sz002086":{"day":[["2026-11-06","4","4","4","4"],["2026-11-09","4","4.1","4.1","4"]]}}}""")
+        val observing=object:PoolHistoryStore by backing {
+            override fun write(writes:List<HistoryWrite>){assertTrue("old result visible before slow import",shown);backing.write(writes)}
+        }
+        LegacyPoolImport(directory,observing).restore {cached->assertEquals(batch,cached);shown=true}
+        assertTrue(shown);assertEquals(1,backing.histories.size)
+    }
     @Test fun importsActualBarDateAndBothProviderFamiliesWithoutNetwork()=runBlocking {
         val directory=Files.createTempDirectory("old-pool").toFile()
         val raw="""{"data":{"sz002086":{"qfqday":[["2026-11-05","4","4","4","4"],["2026-11-06","4","4.1","4.2","4"]]}}}"""

@@ -1,0 +1,18 @@
+# 独立代码复核与修复
+
+复核范围：039e04d..c5e8a2a，fresh-context只读reviewer一次；没有执行通用安全基线或额外扫描。
+
+复核发现3项Important，1项Minor。以下统一在一次修复中完成：
+
+1. 个股报价必须是该日期且至少15:00；未就绪的活跃报价不能落入可复用报价缓存。重建也须先排除无成交和未就绪报价，不能绕过验证补造日线。
+2. 历史回补须实际包含当日日线，不能只在滞后的历史末尾拼当前报价。未更新时切换来源，仍缺则保留失败待重试。
+3. 上市首日单条原始数据经收益解析为空时，核对上市元数据；确认处于初期豁免才排除，普通股票空历史继续视为失败。
+4. 升级先显示旧结果，再导入历史。该项原标Minor，按用户等待近一分钟看不到已有结果的影响提升为Important并修复。
+
+回归用例先观察失败：5个行为用例失败；另一个显示顺序用例因缺失restore入口编译失败。随后统一修复，全套JVM通过。安卓暂停续传测试额外定位到复用上次进度的时序假设，改为可控制批次的固定行情源、真实SQLite与真实AppState/UI集成测试，稳定复现暂停后100条检查点、恢复后300条完整提交；保留六市场真实行情集成用例。
+
+边界裁定：reviewer未评价接口未抽样的实际覆盖和未来行情修复行为；本版以日期/收盘时刻/来源配对和历史末尾校验承接，但仍保留免费数据条件估算限制，不能保证发现所有历史复权修订。reviewer未评价实体机耗时及真实下一收盘日；本版仅提供Android模拟器与离线模拟后续日证据，不作实机速度承诺。
+
+修复覆盖：IncrementalHistoryTest.activeIntradayQuoteCannotBecomeClose；AfterCloseUpdaterTest.unfinishedQuotesAreNeitherStagedNorPublishedEvenDuringRebuild / rebuildingStillExcludesSuspendedStockWithoutCreatingBar；AfterCloseRepositoryTest.staleHistoryCannotBePatchedIntoSuccessfulRepair / firstDayIpoIsExcludedOnlyAfterVerifiedListingDate；LegacyPoolImportTest.cachedCandidatesAreEmittedBeforeAnyHistoryImport。
+
+无未处理的Critical/Important或延后Minor。按执行技能不进行重复复核，以失败复现→修复→全套测试验收。

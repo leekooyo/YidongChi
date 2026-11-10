@@ -2,6 +2,9 @@ package cn.yidongchi.app
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.activity.compose.setContent
+import cn.yidongchi.app.ui.PoolScreen
+import kotlinx.coroutines.CompletableDeferred
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -65,32 +68,57 @@ class PoolScreenTest {
         ui.onNodeWithText("指数不变").assertIsSelected()
         ui.runOnIdle{if(!wasWatched)state.remove(stock.symbol)}
     }
-    @Test fun realScanCanPauseAndContinueWithoutResettingProgress() {
-        ui.waitForIdle()
-        if(ui.onAllNodesWithText("开始使用").fetchSemanticsNodes().isNotEmpty())ui.onNodeWithText("开始使用").performClick()
-        val state=ViewModelProvider(ui.activity)[AppState::class.java]
-        ui.waitUntil(35_000){!state.busy&&!state.poolLoading}
-        ui.onNodeWithText("明日池").performClick()
+    @Test fun sqliteUpdateCanPauseAndContinueWithoutResettingProgress() {
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        val name="pool-resume-${System.nanoTime()}.db"
+        val db=SQLitePoolHistory(context,name)
+        val day=LocalDate.parse("2026-11-09")
+        val stocks=(1..300).map{Stock("sh60"+it.toString().padStart(4,'0'),"测试股$it",Board.SH_MAIN,LocalDate.parse("2000-01-01"))}
+        val indices=AfterCloseIndices.symbols.map{Stock(it,"指数",Watchlist.boardFor(it))}
+        db.metadata("legacy-import","done")
+        db.write((stocks+indices).map{s->HistoryWrite(HistorySeries(s,"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd()))),true)})
+        val continueQuotes=CompletableDeferred<Unit>()
+        val source=object:AfterCloseSource {
+            override var requestCount=0
+            var batches=0
+            override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return indices.associate{s->s.symbol to Quote(s,"4".bd(),"4".bd(),day.atTime(15,1),"4".bd(),"4".bd(),null,null)}}
+            override suspend fun universe():List<Stock>{requestCount++;return stocks}
+            override suspend fun quotes(stocks:List<Stock>):Map<String,String> {
+                requestCount++;batches++
+                if(batches>1)continueQuotes.await()
+                return stocks.associate{s->
+                    val f=MutableList(60){"0"};f[1]=s.name;f[3]="4.1";f[4]="4";f[6]="100";f[30]="20261109150100";f[33]="4.1";f[34]="4";f[47]="4.4";f[48]="3.6"
+                    s.symbol to "v_${s.symbol}=\"${f.joinToString("~")}\";"
+                }
+            }
+            override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries=error("normal stocks must not repair")
+            override suspend fun indexHistory(symbol:String,provider:String,date:LocalDate):HistorySeries=error("normal indices must not repair")
+        }
+        lateinit var state:AppState
+        ui.runOnIdle {
+            state=AppState(ui.activity.application,db,source);state.active=false
+            ui.activity.setContent{PoolScreen(state){}}
+        }
+        ui.waitUntil(35_000){!state.poolLoading}
         try {
-            val previous=state.poolBatch
-            ui.runOnIdle{state.active=false;state.startPool(newBatch=true)}
-            ui.waitUntil(150_000){(state.poolProgress.batch?.processed?:0)>=100||state.poolError.isNotBlank()}
+            ui.runOnIdle{state.startPool()}
+            ui.waitUntil(35_000){(state.poolProgress.batch?.processed?:0)>=100||state.poolError.isNotBlank()}
             assertEquals("",state.poolError)
             ui.onNodeWithTag("pool-list").performScrollToNode(hasText("暂停更新"))
-            ui.onNodeWithText("暂停更新").performScrollTo().assertIsDisplayed().performClick()
+            ui.onNodeWithText("暂停更新").performScrollTo().performClick()
             ui.waitUntil(35_000){!state.poolRunning}
-            val processed=state.poolProgress.batch!!.processed
-            assertTrue(processed>=6)
-            val context=InstrumentationRegistry.getInstrumentation().targetContext
-            assertEquals(processed,SQLitePoolHistory(context).use{it.pending()!!.processed})
-            ui.onNodeWithTag("pool-list").performScrollToNode(hasText("更新收盘数据"))
-            ui.onNodeWithText("更新收盘数据").performScrollTo().assertIsDisplayed().performClick()
-            ui.waitUntil(60_000){(state.poolProgress.batch?.processed?:0)>processed||state.poolError.isNotBlank()}
-            assertEquals("",state.poolError)
-            assertTrue(state.poolProgress.batch!!.processed>processed)
-        }finally{
+            assertEquals(100,state.poolProgress.batch!!.processed)
+            assertEquals(100,db.pending()!!.processed)
+            assertEquals(100,db.quotes(day).size)
+            ui.onNodeWithText("更新收盘数据").performScrollTo().performClick()
+            continueQuotes.complete(Unit)
+            ui.waitUntil(35_000){!state.poolRunning}
+            assertEquals("",state.poolError);assertTrue(state.poolBatch!!.complete)
+            assertEquals(300,state.poolBatch!!.processed);assertNull(db.pending())
+        }finally {
             ui.runOnIdle{state.pausePool()}
             ui.waitUntil(35_000){!state.poolRunning}
+            db.close();context.deleteDatabase(name)
         }
     }
 }

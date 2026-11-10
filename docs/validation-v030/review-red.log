@@ -1,0 +1,67 @@
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:compileKotlin UP-TO-DATE
+> Task :core:compileJava NO-SOURCE
+> Task :core:processResources NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+
+AfterCloseRepositoryTest > staleHistoryCannotBePatchedIntoSuccessfulRepair FAILED
+    java.lang.AssertionError at AfterCloseRepositoryTest.kt:14
+
+AfterCloseRepositoryTest > firstDayIpoIsExcludedOnlyAfterVerifiedListingDate FAILED
+    java.lang.IllegalArgumentException at PoolRepository.kt:50
+        Caused by: java.lang.IllegalArgumentException at PoolRepository.kt:50
+
+AfterCloseUpdaterTest > rebuildingStillExcludesSuspendedStockWithoutCreatingBar FAILED
+    java.lang.AssertionError at AfterCloseUpdaterTest.kt:80
+
+AfterCloseUpdaterTest > unfinishedQuotesAreNeitherStagedNorPublishedEvenDuringRebuild FAILED
+    java.lang.AssertionError at AfterCloseUpdaterTest.kt:71
+
+IncrementalHistoryTest > activeIntradayQuoteCannotBecomeClose FAILED
+    java.lang.AssertionError at IncrementalHistoryTest.kt:42
+
+16 tests completed, 5 failed
+
+> Task :app:testDebugUnitTest FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///D:/Projects/YidongChi/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 5s
+24 actionable tasks: 2 executed, 22 up-to-date

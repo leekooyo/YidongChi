@@ -25,7 +25,11 @@ class ScreenshotDisplayTest {
             state.store.put("index-sz002086","0")
             state.store.put("normal-sz002086","")
             state.store.put("severe-sz002086","")
-            state.select("sz002086")
+            fun text(s:String,suffix:String)=InstrumentationRegistry.getInstrumentation().context.assets.open("comparison-20261109/$s$suffix").bufferedReader().use{it.readText()}
+            val q=MarketParser.quote("sz002086",text("sz002086","-quote.txt"))
+            val iq=MarketParser.quote("sz399107",text("sz399107","-quote.txt"))
+            state.workspaces.calculation.select("sz002086")
+            state.snapshots["sz002086"]=MarketSnapshot(q,iq,MarketParser.withQuote(MarketParser.daily("sz002086",text("sz002086","-daily.json")),q),MarketParser.withQuote(MarketParser.daily("sz399107",text("sz399107","-daily.json")),iq,true))
             state.workspaces.calculation.flag("next-day").value=false
             state.workspaces.calculation.text("index","0").value="0"
         }

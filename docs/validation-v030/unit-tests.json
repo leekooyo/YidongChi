@@ -1,5 +1,5 @@
 {
-  "tests": 69,
+  "tests": 75,
   "failures": 0,
   "errors": 0,
   "skipped": 2,
@@ -48,28 +48,28 @@
     },
     {
       "name": "cn.yidongchi.app.AfterCloseRepositoryTest",
-      "tests": "1",
+      "tests": "3",
       "failures": "0",
       "errors": "0",
       "skipped": "0"
     },
     {
       "name": "cn.yidongchi.app.AfterCloseUpdaterTest",
-      "tests": "5",
+      "tests": "7",
       "failures": "0",
       "errors": "0",
       "skipped": "0"
     },
     {
       "name": "cn.yidongchi.app.IncrementalHistoryTest",
-      "tests": "5",
+      "tests": "6",
       "failures": "0",
       "errors": "0",
       "skipped": "0"
     },
     {
       "name": "cn.yidongchi.app.LegacyPoolImportTest",
-      "tests": "2",
+      "tests": "3",
       "failures": "0",
       "errors": "0",
       "skipped": "0"

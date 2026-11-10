@@ -38,4 +38,8 @@ class IncrementalHistoryTest {
         val plan=IncrementalHistory.plan(old,noLimit,date) as HistoryDecision.Write
         assertFalse(plan.value.series.bars.single().eligible)
     }
+    @Test fun activeIntradayQuoteCannotBecomeClose() {
+        try {IncrementalHistory.plan(old,quote().copy(time=date.atTime(14,59)),date);fail("intraday")}
+        catch(e:IllegalArgumentException){assertTrue(e.message!!.contains("未就绪"))}
+    }
 }

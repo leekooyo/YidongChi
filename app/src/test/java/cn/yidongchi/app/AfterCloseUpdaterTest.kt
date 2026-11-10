@@ -16,9 +16,10 @@ class AfterCloseUpdaterTest {
     private inner class Source(val stocks:List<Stock> = listOf(stock)):AfterCloseSource {
         override var requestCount=0
         var repairs=0;var batches=0;var universes=0;var fail=false;var afterQuotes:(suspend ()->Unit)?=null
+        var quoteOverride:String?=null
         override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return AfterCloseIndices.symbols.associateWith{val s=Stock(it,"指数",Watchlist.boardFor(it));Quote(s,"100".bd(),"100".bd(),day.atTime(15,1),"100".bd(),"100".bd(),null,null)}}
         override suspend fun universe():List<Stock>{universes++;requestCount++;return stocks}
-        override suspend fun quotes(stocks:List<Stock>):Map<String,String>{batches++;requestCount++;if(fail)error("报价失败");val rows=stocks.associate{it.symbol to raw(it,day)};afterQuotes?.invoke();return rows}
+        override suspend fun quotes(stocks:List<Stock>):Map<String,String>{batches++;requestCount++;if(fail)error("报价失败");val rows=stocks.associate{it.symbol to (quoteOverride?:raw(it,day))};afterQuotes?.invoke();return rows}
         override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries {repairs++;return HistorySeries(stock.copy(listedOn=this@AfterCloseUpdaterTest.stock.listedOn),"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd()),Bar(day,"4.1".bd(),"4".bd())))}
         override suspend fun indexHistory(symbol:String,provider:String,date:LocalDate)=HistorySeries(Stock(symbol,"指数",Watchlist.boardFor(symbol)),provider,listOf(Bar(day.minusDays(3),"100".bd(),"100".bd()),Bar(day,"100".bd(),"100".bd())))
     }
@@ -66,5 +67,21 @@ class AfterCloseUpdaterTest {
         updater.update({ResetDates()}){}
         updater.update({ResetDates()},force=true){}
         assertEquals(2,source.batches);assertEquals(2,store.history(stock.symbol)!!.bars.size);assertEquals(0,source.repairs)
+    }
+    @Test fun unfinishedQuotesAreNeitherStagedNorPublishedEvenDuringRebuild()=runBlocking {
+        for(rebuild in listOf(false,true)) {
+            val source=Source();val store=seed()
+            source.quoteOverride=raw(stock,day).replace("150100","143000")
+            val result=AfterCloseUpdater(source,store).update({ResetDates()},rebuild=rebuild){}
+            assertFalse(result.complete);assertEquals(1,result.failures.size)
+            assertTrue(store.quotes(day).isEmpty());assertEquals(0,source.repairs)
+        }
+    }
+    @Test fun rebuildingStillExcludesSuspendedStockWithoutCreatingBar()=runBlocking {
+        val source=Source();val store=seed()
+        source.quoteOverride=raw(stock,day).replace("~100~","~0~")
+        val result=AfterCloseUpdater(source,store).update({ResetDates()},rebuild=true){}
+        assertTrue(result.complete);assertEquals(1,result.exclusions.size);assertEquals(0,source.repairs)
+        assertEquals(day.minusDays(3),store.history(stock.symbol)!!.bars.last().date)
     }
 }

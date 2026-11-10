@@ -11,7 +11,11 @@ import kotlinx.coroutines.sync.withPermit
 import java.math.BigDecimal
 import java.time.LocalDate
 
-class AppState(app:Application):AndroidViewModel(app) {
+class AppState @JvmOverloads constructor(
+    app:Application,
+    private val poolHistory:PoolHistoryStore=SQLitePoolHistory(app),
+    private val closeSource:AfterCloseSource=AfterCloseRepository(java.io.File(app.filesDir,"pool"))
+):AndroidViewModel(app) {
     val store=LocalStore(app)
     val workspaces=StockWorkspaces(store::value,store::put)
     private val repository=MarketRepository()
@@ -33,8 +37,6 @@ class AppState(app:Application):AndroidViewModel(app) {
     var warningsAll by mutableStateOf(store.value("warnings-all","false")=="true");private set
     var active by mutableStateOf(true)
     private val poolDirectory=java.io.File(app.filesDir,"pool")
-    private val poolHistory=SQLitePoolHistory(app)
-    private val closeSource=AfterCloseRepository(poolDirectory)
     var poolProgress by mutableStateOf(CloseProgress(""));private set
     var poolBatch by mutableStateOf<PoolBatch?>(null)
     var poolRunning by mutableStateOf(false);private set
@@ -51,7 +53,7 @@ class AppState(app:Application):AndroidViewModel(app) {
             try {
                 poolProgress=CloseProgress("导入已有缓存")
                 val loaded=withContext(Dispatchers.IO) {
-                    LegacyPoolImport(poolDirectory,poolHistory).run()
+                    LegacyPoolImport(poolDirectory,poolHistory).restore {cached->withContext(Dispatchers.Main){poolBatch=cached}}
                     poolHistory.complete() to poolHistory.pending()
                 }
                 poolBatch=loaded.first?:loaded.second

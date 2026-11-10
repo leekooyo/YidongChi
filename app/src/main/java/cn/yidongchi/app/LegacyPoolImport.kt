@@ -6,6 +6,10 @@ import kotlinx.coroutines.ensureActive
 import java.io.File
 
 class LegacyPoolImport(private val directory:File,private val store:PoolHistoryStore) {
+    suspend fun restore(onCached:suspend (PoolBatch?)->Unit) {
+        onCached(store.complete()?:store.pending()?:File(directory,"batch.json").takeIf{it.isFile}?.let{PoolCodec.decode(it.readText())})
+        run()
+    }
     suspend fun run() {
         if(store.metadata("legacy-import")=="done")return
         val batchFile=File(directory,"batch.json")

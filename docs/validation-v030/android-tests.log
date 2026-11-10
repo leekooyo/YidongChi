@@ -77,14 +77,14 @@ INSTRUMENTATION_STATUS: current=6
 INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
 INSTRUMENTATION_STATUS: numtests=14
 INSTRUMENTATION_STATUS: stream=
-INSTRUMENTATION_STATUS: test=realScanCanPauseAndContinueWithoutResettingProgress
+INSTRUMENTATION_STATUS: test=sqliteUpdateCanPauseAndContinueWithoutResettingProgress
 INSTRUMENTATION_STATUS_CODE: 1
 INSTRUMENTATION_STATUS: class=cn.yidongchi.app.PoolScreenTest
 INSTRUMENTATION_STATUS: current=6
 INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
 INSTRUMENTATION_STATUS: numtests=14
 INSTRUMENTATION_STATUS: stream=.
-INSTRUMENTATION_STATUS: test=realScanCanPauseAndContinueWithoutResettingProgress
+INSTRUMENTATION_STATUS: test=sqliteUpdateCanPauseAndContinueWithoutResettingProgress
 INSTRUMENTATION_STATUS_CODE: 0
 INSTRUMENTATION_STATUS: class=cn.yidongchi.app.PoolScreenTest
 INSTRUMENTATION_STATUS: current=7
@@ -204,7 +204,7 @@ INSTRUMENTATION_STATUS: test=cancelledEventLoadRestoresItsOwnStatus
 INSTRUMENTATION_STATUS_CODE: 0
 INSTRUMENTATION_RESULT: stream=
 
-Time: 33.66
+Time: 25.052
 
 OK (14 tests)
 
