@@ -66,7 +66,7 @@ fun copyText(context:Context,text:String){(context.getSystemService(Context.CLIP
             labels.forEachIndexed {i,s->NavigationBarItem(selected=page==i,onClick={page=i},icon={Icon(icons[i],s)},label={Text(s)})}
         }}) {padding->
             PullToRefreshBox(isRefreshing=state.busy,onRefresh={state.refreshNow()},modifier=Modifier.fillMaxSize().padding(padding)) {when(page){
-                0->WatchHome(state,onOpen={state.select(it);page=1},onPoolOpen={state.openPoolStock(it);page=1})
+                0->WatchHome(state,onOpen={state.select(it);page=1},onPoolOpen={symbol,today->state.openPoolStock(symbol,today);page=1})
                 1->CalculationScreen(state)
                 2->ForecastScreen(state)
                 3->EventsScreen(state)

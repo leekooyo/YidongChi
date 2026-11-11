@@ -32,7 +32,7 @@ class AfterCloseCacheAuditTest {
                 quoteRequests++
                 return stocks.associate{s->val old=store.history(s.symbol);val price=old?.bars?.last()?.close?:"1".bd();val f=MutableList(60){"0"};f[1]=s.name;f[3]=price.toPlainString();f[4]=price.toPlainString();f[6]=if(s.symbol in exclusions)"0"else "100";f[30]=date.toString().replace("-","")+"150100";f[33]=f[3];f[34]=f[3];f[47]=price.multiply("1.1".bd()).toPlainString();f[48]=price.multiply("0.9".bd()).toPlainString();s.symbol to "v_${s.symbol}=\"${f.joinToString("~")}\";"}
             }
-            override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries {
+            override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate,today:Boolean):HistorySeries {
                 repairs++
                 val old=store.history(stock.symbol)?:error("missing historical cache: ${stock.symbol}")
                 return old.copy(stock=quote.stock.copy(listedOn=LocalDate.parse("2000-01-01")),bars=MarketParser.withQuote(old.bars,quote))

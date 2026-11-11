@@ -37,6 +37,10 @@ class AppState @JvmOverloads constructor(
     var warningsAll by mutableStateOf(store.value("warnings-all","false")=="true");private set
     var active by mutableStateOf(true)
     private val poolDirectory=java.io.File(app.filesDir,"pool")
+    var todayPoolBatch by mutableStateOf<PoolBatch?>(null);private set
+    var todayPoolProgress by mutableStateOf(CloseProgress(""));private set
+    var todayPoolError by mutableStateOf("");private set
+    var poolUpdatingToday by mutableStateOf(false);private set
     var poolProgress by mutableStateOf(CloseProgress(""));private set
     var poolBatch by mutableStateOf<PoolBatch?>(null)
     var poolRunning by mutableStateOf(false);private set
@@ -63,31 +67,45 @@ class AppState @JvmOverloads constructor(
             finally{poolLoading=false}
         }
     }
-    fun startPool(newBatch:Boolean=false,retry:Boolean=false,rebuild:Boolean=false) {
+    fun startPool(newBatch:Boolean=false,retry:Boolean=false,rebuild:Boolean=false,today:Boolean=false) {
         if(poolRunning||poolLoading)return
-        poolRunning=true;poolError=""
+        poolUpdatingToday=today
+        poolRunning=true
+        if(today)todayPoolError="" else poolError=""
+        fun reportError(message:String) {
+            if(today)todayPoolError=message else poolError=message
+        }
         poolJob=viewModelScope.launch {
             try {
                 val result=withContext(Dispatchers.IO) {
                     LegacyPoolImport(poolDirectory,poolHistory).run()
-                    AfterCloseUpdater(closeSource,poolHistory).update(::resets,force=newBatch,rebuild=rebuild) {p->
+                    AfterCloseUpdater(closeSource,poolHistory).update(::resets,force=newBatch,rebuild=rebuild,today=today) {p->
                         withContext(Dispatchers.Main) {
-                            poolProgress=p
-                            if(poolBatch?.complete!=true&&p.batch!=null)poolBatch=p.batch
+                            if(today) {
+                                todayPoolProgress=p
+                                if(p.batch!=null)todayPoolBatch=p.batch
+                            } else {
+                                poolProgress=p
+                                if(poolBatch?.complete!=true&&p.batch!=null)poolBatch=p.batch
+                            }
                         }
                     }
                 }
-                if(result.complete)poolBatch=result
-                else poolError="${result.failures.size} 只更新失败，点击更新可重试"
-            }catch(e:CancellationException){poolProgress=poolProgress.copy(stage="已暂停，可继续更新");throw e}
-            catch(e:Exception){poolError=e.message?:"更新失败，请重试"}
+                if(today)todayPoolBatch=result else if(result.complete)poolBatch=result
+                if(result.failures.isNotEmpty())reportError("${result.failures.size} 只更新失败，点击更新可重试")
+            }catch(e:CancellationException){
+                if(today)todayPoolProgress=todayPoolProgress.copy(stage="已停止")
+                else poolProgress=poolProgress.copy(stage="已暂停，可继续更新")
+                throw e
+            }
+            catch(e:Exception){reportError(e.message?:"更新失败，请重试")}
             finally{poolRunning=false}
         }
     }
     fun pausePool(){poolJob?.cancel()}
-    fun openPoolStock(symbol:String) {
+    fun openPoolStock(symbol:String,today:Boolean=false) {
         select(symbol)
-        workspaces.calculation.flag("next-day").value=true
+        workspaces.calculation.flag("next-day").value=!today
         workspaces.calculation.text("index","0","index-$symbol").value="0"
     }
     fun setting(key:String,value:String) {store.put(key,value);when(key){"theme"->theme=value;"large"->large=value=="true";"threshold"->threshold=value}}

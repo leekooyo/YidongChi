@@ -7,10 +7,10 @@ data class PoolHit(val level:PriceLevel,val requiredChange:BigDecimal)
 data class PoolStock(val stock:Stock,val targetDate:LocalDate,val price:BigDecimal,val hits:List<PoolHit>,val excludedReason:String?=null)
 
 object TomorrowPool {
-    fun calculate(stock:Stock,bars:List<Bar>,index:List<Bar>,resets:ResetDates=ResetDates()):PoolStock {
+    fun calculate(stock:Stock,bars:List<Bar>,index:List<Bar>,resets:ResetDates=ResetDates(),today:Boolean=false):PoolStock {
         val current=bars.last()
         require(index.last().date==current.date){"个股与基准指数日期不一致"}
-        val target=TradingCalendar.nextDays(current.date,1).single()
+        val target=if(today)current.date else TradingCalendar.nextDays(current.date,1).single()
         val excluded=when {
             stock.excludedFromDeviation->"特殊交易阶段"
             !current.eligible->"无涨跌幅限制或资格未确认"
@@ -18,7 +18,7 @@ object TomorrowPool {
             else->null
         }
         if(excluded!=null)return PoolStock(stock,target,current.close,emptyList(),excluded)
-        val relevant=SecurityEligibility.apply(stock,bars).takeLastWhile{it.eligible}.takeLast(29)
+        val relevant=SecurityEligibility.apply(stock,bars).takeLastWhile{it.eligible}.takeLast(if(today)30 else 29)
             .filter{resets.severe==null||resets.severe>target||it.date>=resets.severe}
         val indexDates=index.map{it.date}.toSet()
         if(relevant.isNotEmpty()) {
@@ -27,7 +27,8 @@ object TomorrowPool {
             val expected=generateSequence(first){it.plusDays(1)}.takeWhile{it<=current.date}.filter{TradingCalendar.isTradingDay(it)}
             require(relevant.all{it.date in indexDates}&&expected.all{it in indexDates}){"指数日期不完整，暂不能计算"}
         }
-        val analysis=Projection.project(stock,bars,index,Scenario(),1,resets).single().analysis
+        val analysis=if(today)PriceEngine.analyze(stock,bars,index,target,index.last().close,resets)
+            else Projection.project(stock,bars,index,Scenario(),1,resets).single().analysis
         val hits=analysis.levels.filter {it.ruleId!="normal"&&(it.satisfied||it.reachable)}.map {
             PoolHit(it,if(it.satisfied)BigDecimal.ZERO else it.price.subtract(current.close).ratio(current.close))
         }

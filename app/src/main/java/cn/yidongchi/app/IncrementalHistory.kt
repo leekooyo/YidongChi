@@ -14,9 +14,10 @@ sealed interface HistoryDecision {
 
 object IncrementalHistory {
     fun closed(quote:Quote,date:LocalDate)=quote.time.toLocalDate()==date&&quote.time.toLocalTime()>=LocalTime.of(15,0)
-    fun plan(series:HistorySeries?,quote:Quote,date:LocalDate,index:Boolean=false):HistoryDecision {
+    fun plan(series:HistorySeries?,quote:Quote,date:LocalDate,index:Boolean=false,today:Boolean=false):HistoryDecision {
         if(!index&&quote.volume.signum()==0)return HistoryDecision.Excluded
-        require(closed(quote,date)){"收盘行情未就绪"}
+        if(today)require(quote.time.toLocalDate()==date){"个股行情日期与指数不一致"}
+        else require(closed(quote,date)){"收盘行情未就绪"}
         if(series==null||series.bars.isEmpty())return HistoryDecision.Repair
         if(!index&&series.bars.size<35&&series.stock.listedOn==null)return HistoryDecision.Repair
         val last=series.bars.last()

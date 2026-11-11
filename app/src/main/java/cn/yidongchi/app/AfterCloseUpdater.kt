@@ -8,17 +8,28 @@ import java.time.LocalTime
 data class CloseProgress(val stage:String,val batch:PoolBatch?=null,val requests:Int=0,val repairs:Int=0)
 
 class AfterCloseUpdater(private val source:AfterCloseSource,private val store:PoolHistoryStore) {
-    suspend fun update(resets:(String)->ResetDates,force:Boolean=false,rebuild:Boolean=false,onProgress:suspend (CloseProgress)->Unit):PoolBatch {
+    suspend fun update(resets:(String)->ResetDates,force:Boolean=false,rebuild:Boolean=false,today:Boolean=false,onProgress:suspend (CloseProgress)->Unit):PoolBatch {
         var repairs=0
         val initialRequests=source.requestCount
         suspend fun progress(stage:String,batch:PoolBatch?=null){onProgress(CloseProgress(stage,batch,source.requestCount-initialRequests,repairs));currentCoroutineContext().ensureActive()}
-        progress("探测收盘日期")
+        progress(if(today)"读取盘中行情" else "探测收盘日期")
         val quotes=source.indexQuotes()
         val dates=quotes.values.map{it.time.toLocalDate()}.distinct()
-        require(dates.size==1&&quotes.size==4&&quotes.values.all{it.time.toLocalTime()>=LocalTime.of(15,0)}){"收盘行情尚未就绪，请稍后更新"}
-        val date=dates.single();TradingCalendar.nextDays(date,1)
-        val complete=store.complete();val pending=store.pending()
-        if(!force&&!rebuild&&pending==null&&complete?.basis?.time?.toLocalDate()==date){progress("已是最新收盘数据",complete);return complete}
+        require(dates.size==1&&quotes.size==4){"指数行情日期不一致，请稍后更新"}
+        require(today||quotes.values.all{it.time.toLocalTime()>=LocalTime.of(15,0)}){"收盘行情尚未就绪，请稍后更新"}
+        val date=dates.single()
+        if(!today)TradingCalendar.nextDays(date,1)
+        val complete=store.complete()
+        val intradayStocks=if(today) {
+            val closeDate=complete?.basis?.time?.toLocalDate()
+            require(complete?.complete==true && closeDate!=null && closeDate<date &&
+                TradingCalendar.nextDays(closeDate,1).single()==date) {
+                "缺少当天候选名单，请在收盘后更新明日池"
+            }
+            complete.rows.filter{it.targetDate==date}.map{it.stock}.distinctBy{it.symbol}
+        } else null
+        val pending=if(today)null else store.pending()
+        if(!today&&!force&&!rebuild&&pending==null&&complete?.basis?.time?.toLocalDate()==date){progress("已是最新收盘数据",complete);return complete}
         require(complete==null||date>=complete.basis.time.toLocalDate()){"行情源日期早于本地结果，请稍后重试"}
         val indexCache=mutableMapOf<Pair<String,String>,HistorySeries>()
         suspend fun index(symbol:String,provider:String):HistorySeries {
@@ -26,30 +37,34 @@ class AfterCloseUpdater(private val source:AfterCloseSource,private val store:Po
             return indexCache.getOrPutSuspend(key) {
                 val q=quotes.getValue(symbol)
                 val old=store.history(symbol,provider)
-                val plan=if(rebuild)HistoryDecision.Repair else IncrementalHistory.plan(old,q,date,true)
+                val plan=if(rebuild)HistoryDecision.Repair else IncrementalHistory.plan(old,q,date,index=true,today=today)
                 val write=if(plan is HistoryDecision.Write)plan.value else HistoryWrite(source.indexHistory(symbol,provider,date).let{it.copy(bars=MarketParser.withQuote(it.bars,q,true))},true)
-                store.write(listOf(write))
+                if(!today)store.write(listOf(write))
                 IncrementalHistory.merge(old,write)
             }
         }
         var provider="tencent"
-        val primary=try {AfterCloseIndices.symbols.associateWith{index(it,provider).bars}}catch(e:Exception) {
+        val primary=if(today)emptyMap() else try {AfterCloseIndices.symbols.associateWith{index(it,provider).bars}}catch(e:Exception) {
             if(e is CancellationException)throw e
             provider="eastmoney";AfterCloseIndices.symbols.associateWith{index(it,provider).bars}
         }
         val basis=PoolBasis(quotes.values.maxOf{it.time},primary,AfterCloseIndices.label(provider))
-        var batch=if(!force&&!rebuild&&pending?.basis?.time?.toLocalDate()==date)pending.retryFailures()
+        var batch=if(intradayStocks!=null)PoolBatch(basis,intradayStocks)
+            else if(!force&&!rebuild&&pending?.basis?.time?.toLocalDate()==date)pending.retryFailures()
             else {progress("同步证券清单");PoolBatch(basis,source.universe())}
-        store.begin(batch,clearQuotes=force||rebuild)
-        val saved=store.quotes(date).toMutableMap()
+        if(!today)store.begin(batch,clearQuotes=force||rebuild)
+        val saved=if(today) mutableMapOf<String,String>() else store.quotes(date).toMutableMap()
         for(chunk in batch.universe.filter{it.symbol !in batch.outcomes}.chunked(100)) {
             progress("同步行情",batch)
             val missing=chunk.filter{it.symbol !in saved}
             if(missing.isNotEmpty()) {
                 val incoming=source.quotes(missing)
                 // Only stage usable current quotes (or explicit no-trade rows). Missing/stale active rows retry on the next update.
-                val reusable=incoming.filter{(symbol,raw)->runCatching{val q=MarketParser.quote(symbol,raw);q.volume.signum()==0||IncrementalHistory.closed(q,date)}.getOrDefault(noTrade(raw))}
-                store.saveQuotes(date,reusable);saved.putAll(incoming)
+                if(!today) {
+                    val reusable=incoming.filter{(symbol,raw)->runCatching{val q=MarketParser.quote(symbol,raw);q.volume.signum()==0||IncrementalHistory.closed(q,date)}.getOrDefault(noTrade(raw))}
+                    store.saveQuotes(date,reusable)
+                }
+                saved.putAll(incoming)
             }
             progress("本地计算",batch)
             val outcomes=linkedMapOf<String,PoolOutcome>();val writes=mutableListOf<HistoryWrite>()
@@ -61,21 +76,22 @@ class AfterCloseUpdater(private val source:AfterCloseSource,private val store:Po
                     if(noTrade(raw))throw PoolExcluded("停牌或暂无成交价")
                     val q=MarketParser.quote(stock.symbol,raw)
                     val old=store.history(stock.symbol)
-                    val checked=IncrementalHistory.plan(old,q,date)
+                    val checked=IncrementalHistory.plan(old,q,date,today=today)
                     if(checked is HistoryDecision.Excluded)throw PoolExcluded("停牌或当日无成交")
                     val plan=if(rebuild)HistoryDecision.Repair else checked
                     val write=if(plan is HistoryDecision.Write)plan.value else {
                         repairs++;progress("补齐历史",batch)
-                        HistoryWrite(source.repair(old?.stock?:stock,q,date),true)
+                        HistoryWrite(source.repair(old?.stock?:stock,q,date,today),true)
                     }
                     val series=IncrementalHistory.merge(old,write)
                     var ix=index(stock.board.indexSymbol,series.provider)
                     val oldest=series.bars.takeLast(29).first().date
                     if(ix.bars.first().date>oldest) {
                         ix=source.indexHistory(stock.board.indexSymbol,series.provider,date).let{it.copy(bars=MarketParser.withQuote(it.bars,quotes.getValue(stock.board.indexSymbol),true))}
-                        store.write(listOf(HistoryWrite(ix,true)));indexCache[stock.board.indexSymbol to series.provider]=ix
+                        if(!today)store.write(listOf(HistoryWrite(ix,true)))
+                        indexCache[stock.board.indexSymbol to series.provider]=ix
                     }
-                    val result=TomorrowPool.calculate(series.stock,series.bars,ix.bars,resets(stock.symbol))
+                    val result=TomorrowPool.calculate(series.stock,series.bars,ix.bars,resets(stock.symbol),today=today)
                     writes+=write
                     if(result.excludedReason!=null)PoolOutcome(issue=result.excludedReason,excluded=true,provider=AfterCloseIndices.label(series.provider))
                     else PoolOutcome(result=result.takeIf{it.hits.isNotEmpty()},provider=AfterCloseIndices.label(series.provider))
@@ -85,10 +101,15 @@ class AfterCloseUpdater(private val source:AfterCloseSource,private val store:Po
                 outcomes[stock.symbol]=outcome
             }
             batch=batch.copy(outcomes=batch.outcomes+outcomes)
-            store.checkpoint(batch.copy(outcomes=outcomes),writes)
+            if(!today)store.checkpoint(batch.copy(outcomes=outcomes),writes)
             progress("本地计算",batch)
         }
-        if(batch.complete){store.finish(batch);progress("更新完成",batch)}
+        if(today)progress(when {
+            batch.universe.isEmpty() -> "上次收盘没有筛出今日候选"
+            batch.complete -> "更新完成"
+            else -> "部分行情未获取"
+        },batch)
+        else if(batch.complete){store.finish(batch);progress("更新完成",batch)}
         else progress("部分失败，保留上次完整结果",batch)
         return batch
     }

@@ -10,7 +10,7 @@ interface AfterCloseSource {
     suspend fun indexQuotes():Map<String,Quote>
     suspend fun universe():List<Stock>
     suspend fun quotes(stocks:List<Stock>):Map<String,String>
-    suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries
+    suspend fun repair(stock:Stock,quote:Quote,date:LocalDate,today:Boolean=false):HistorySeries
     suspend fun indexHistory(symbol:String,provider:String,date:LocalDate):HistorySeries
 }
 
@@ -27,7 +27,7 @@ class AfterCloseRepository(directory:File,request:((String,Boolean)->String)?=nu
         require(stocks.size<=100)
         splitQuotes(legacy.fetch("https://qt.gtimg.cn/q=${stocks.joinToString(","){it.symbol}}",true))
     }
-    override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries = withContext(Dispatchers.IO) {
+    override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate,today:Boolean):HistorySeries = withContext(Dispatchers.IO) {
         var listing=stock.listedOn?.let{quote.stock.copy(listedOn=it)}
         suspend fun metadata():Stock {
             listing?.let{return it}
@@ -40,7 +40,10 @@ class AfterCloseRepository(directory:File,request:((String,Boolean)->String)?=nu
                 if(e.message=="日线数据为空"&&SecurityEligibility.initialExempt(metadata(),date))throw PoolExcluded("上市初期无涨跌幅限制，暂不推算")
                 throw e
             }
-            require(bars.last().date==date){"当日日线尚未更新，稍后重试历史回补"}
+            val last=bars.last()
+            val previousSession= today && last.date<date && TradingCalendar.nextDays(last.date,1).single()==date &&
+                last.close.compareTo(quote.previousClose)==0
+            require(last.date==date||previousSession){"日线尚未更新，稍后重试历史回补"}
             return bars
         }
         var provider=if(tencentUnavailable)"eastmoney"else "tencent"

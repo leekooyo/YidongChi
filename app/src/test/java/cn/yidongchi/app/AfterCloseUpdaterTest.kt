@@ -17,15 +17,48 @@ class AfterCloseUpdaterTest {
         override var requestCount=0
         var repairs=0;var batches=0;var universes=0;var fail=false;var afterQuotes:(suspend ()->Unit)?=null
         var quoteOverride:String?=null
-        override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return AfterCloseIndices.symbols.associateWith{val s=Stock(it,"指数",Watchlist.boardFor(it));Quote(s,"100".bd(),"100".bd(),day.atTime(15,1),"100".bd(),"100".bd(),null,null)}}
+        val quotedSymbols=mutableListOf<String>()
+        var quoteHour=15
+        override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return AfterCloseIndices.symbols.associateWith{val s=Stock(it,"指数",Watchlist.boardFor(it));Quote(s,"100".bd(),"100".bd(),day.atTime(quoteHour,1),"100".bd(),"100".bd(),null,null)}}
         override suspend fun universe():List<Stock>{universes++;requestCount++;return stocks}
-        override suspend fun quotes(stocks:List<Stock>):Map<String,String>{batches++;requestCount++;if(fail)error("报价失败");val rows=stocks.associate{it.symbol to (quoteOverride?:raw(it,day))};afterQuotes?.invoke();return rows}
-        override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries {repairs++;return HistorySeries(stock.copy(listedOn=this@AfterCloseUpdaterTest.stock.listedOn),"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd()),Bar(day,"4.1".bd(),"4".bd())))}
+        override suspend fun quotes(stocks:List<Stock>):Map<String,String>{batches++;requestCount++;quotedSymbols.addAll(stocks.map{it.symbol});if(fail)error("报价失败");val rows=stocks.associate{it.symbol to (quoteOverride?:raw(it,day))};afterQuotes?.invoke();return rows}
+        override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate,today:Boolean):HistorySeries {repairs++;return HistorySeries(stock.copy(listedOn=this@AfterCloseUpdaterTest.stock.listedOn),"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd()),Bar(day,"4.1".bd(),"4".bd())))}
         override suspend fun indexHistory(symbol:String,provider:String,date:LocalDate)=HistorySeries(Stock(symbol,"指数",Watchlist.boardFor(symbol)),provider,listOf(Bar(day.minusDays(3),"100".bd(),"100".bd()),Bar(day,"100".bd(),"100".bd())))
     }
     private fun seed(stocks:List<Stock> = listOf(stock))=MemoryHistoryStore().also{store->
         val series=stocks.map{HistorySeries(it,"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd())))}+AfterCloseIndices.symbols.map{HistorySeries(Stock(it,"指数",Watchlist.boardFor(it)),"tencent",listOf(Bar(day.minusDays(3),"100".bd(),"100".bd())))}
         store.write(series.map{HistoryWrite(it,true)})
+    }
+    @Test fun todayRefreshUsesIntradayQuotesAndLeavesCloseCheckpointAlone()=runBlocking {
+        val outsider=stock.copy(symbol="sz002242",name="九阳")
+        val source=Source(listOf(stock,outsider)).apply {
+            quoteHour=14
+            quoteOverride=raw(stock,day).replace("150100","140100").replace("~4.1~","~8.1~")
+        }
+        val store=seed(source.stocks)
+        val previous=day.minusDays(3)
+        val candidate=TomorrowPool.calculate(stock,listOf(Bar(previous,"8.1".bd(),"4".bd())),listOf(Bar(previous,"100".bd(),"100".bd())))
+        val close=PoolBatch(PoolBasis(previous.atTime(15,1),emptyMap()),source.stocks,
+            mapOf(stock.symbol to PoolOutcome(candidate),outsider.symbol to PoolOutcome()))
+        store.begin(close);store.finish(close)
+        val pending=PoolBatch(PoolBasis(day.atTime(15,1),emptyMap()),listOf(stock))
+        store.begin(pending)
+        val updater=AfterCloseUpdater(source,store)
+        val first=updater.update({ResetDates()},today=true){}
+        assertTrue(first.complete)
+        assertEquals(day,first.rows.single().targetDate)
+        assertEquals("8.1".bd(),first.rows.single().price)
+        assertTrue(first.rows.single().hits.any{it.level.ruleId=="severe10"&&it.level.satisfied})
+        source.quoteOverride=raw(stock,day).replace("150100","140500")
+        assertTrue(updater.update({ResetDates()},today=true){}.rows.isEmpty())
+        assertEquals(2,source.batches)
+        assertEquals(listOf(stock.symbol,stock.symbol),source.quotedSymbols)
+        assertEquals(0,source.universes)
+        assertEquals(0,source.repairs)
+        assertEquals(day.minusDays(3),store.history(stock.symbol)!!.bars.last().date)
+        assertEquals(pending,store.pending())
+        assertEquals(close,store.complete())
+        assertTrue(store.quotes(day).isEmpty())
     }
     @Test fun normalNextCloseUsesBatchQuoteAndNoStockHistoryThenSameDayOnlyProbes()=runBlocking {
         val source=Source();val store=seed();val updater=AfterCloseUpdater(source,store)

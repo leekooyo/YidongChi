@@ -4,6 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.activity.compose.setContent
 import cn.yidongchi.app.ui.PoolScreen
+import cn.yidongchi.app.ui.WatchHome
 import kotlinx.coroutines.CompletableDeferred
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -68,7 +69,10 @@ class PoolScreenTest {
         ui.onNodeWithText("指数不变").assertIsSelected()
         ui.runOnIdle{if(!wasWatched)state.remove(stock.symbol)}
     }
-    @Test fun sqliteUpdateCanPauseAndContinueWithoutResettingProgress() {
+    @Test fun sqliteUpdateCanPauseAndContinueWithoutResettingProgress()=checkPoolUpdate(today=false)
+    @Test fun todayPoolRefreshesBeforeClose()=checkPoolUpdate(today=true)
+
+    private fun checkPoolUpdate(today:Boolean) {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
         val name="pool-resume-${System.nanoTime()}.db"
         val db=SQLitePoolHistory(context,name)
@@ -77,30 +81,58 @@ class PoolScreenTest {
         val indices=AfterCloseIndices.symbols.map{Stock(it,"指数",Watchlist.boardFor(it))}
         db.metadata("legacy-import","done")
         db.write((stocks+indices).map{s->HistoryWrite(HistorySeries(s,"tencent",listOf(Bar(day.minusDays(3),"4".bd(),"4".bd()))),true)})
+        val close=if(today) {
+            val previous=day.minusDays(3)
+            val candidate=TomorrowPool.calculate(stocks.first(),listOf(Bar(previous,"8.1".bd(),"4".bd())),
+                listOf(Bar(previous,"4".bd(),"4".bd())))
+            PoolBatch(PoolBasis(previous.atTime(15,1),emptyMap()),stocks,stocks.associate {
+                it.symbol to PoolOutcome(candidate.takeIf { row->row.stock.symbol==it.symbol })
+            }).also{db.begin(it);db.finish(it)}
+        } else null
         val continueQuotes=CompletableDeferred<Unit>()
         val source=object:AfterCloseSource {
             override var requestCount=0
             var batches=0
-            override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return indices.associate{s->s.symbol to Quote(s,"4".bd(),"4".bd(),day.atTime(15,1),"4".bd(),"4".bd(),null,null)}}
-            override suspend fun universe():List<Stock>{requestCount++;return stocks}
+            override suspend fun indexQuotes():Map<String,Quote>{requestCount++;return indices.associate{s->s.symbol to Quote(s,"4".bd(),"4".bd(),day.atTime(if(today)14 else 15,1),"4".bd(),"4".bd(),null,null)}}
+            override suspend fun universe():List<Stock>{
+                check(!today){"intraday update must not load the market universe"}
+                requestCount++
+                return stocks
+            }
             override suspend fun quotes(stocks:List<Stock>):Map<String,String> {
+                if(today)check(stocks.map{it.symbol}==listOf("sh600001"))
                 requestCount++;batches++
                 if(batches>1)continueQuotes.await()
                 return stocks.associate{s->
-                    val f=MutableList(60){"0"};f[1]=s.name;f[3]="4.1";f[4]="4";f[6]="100";f[30]="20261109150100";f[33]="4.1";f[34]="4";f[47]="4.4";f[48]="3.6"
+                    val f=MutableList(60){"0"};f[1]=s.name;f[3]="4.1";f[4]="4";f[6]="100";f[30]=if(today)"20261109140100" else "20261109150100";f[33]="4.1";f[34]="4";f[47]="4.4";f[48]="3.6"
                     s.symbol to "v_${s.symbol}=\"${f.joinToString("~")}\";"
                 }
             }
-            override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate):HistorySeries=error("normal stocks must not repair")
+            override suspend fun repair(stock:Stock,quote:Quote,date:LocalDate,today:Boolean):HistorySeries=error("normal stocks must not repair")
             override suspend fun indexHistory(symbol:String,provider:String,date:LocalDate):HistorySeries=error("normal indices must not repair")
         }
         lateinit var state:AppState
         ui.runOnIdle {
             state=AppState(ui.activity.application,db,source);state.active=false
-            ui.activity.setContent{PoolScreen(state){}}
+            ui.activity.setContent {
+                if(today)WatchHome(state,{}, {_,_->})
+                else PoolScreen(state){}
+            }
         }
         ui.waitUntil(35_000){!state.poolLoading}
         try {
+            if(today) {
+                continueQuotes.complete(Unit)
+                ui.onNodeWithText("今日池").performClick()
+                ui.onNodeWithTag("pool-list").performScrollToNode(hasText("更新盘中数据"))
+                ui.onNodeWithText("更新盘中数据").performScrollTo().performClick()
+                ui.waitUntil(35_000){state.todayPoolBatch?.complete==true||state.todayPoolError.isNotBlank()}
+                assertEquals("",state.todayPoolError)
+                assertEquals(1,state.todayPoolBatch!!.processed)
+                assertEquals(close,db.complete())
+                assertNull(db.pending())
+                return
+            }
             ui.runOnIdle{state.startPool()}
             ui.waitUntil(35_000){(state.poolProgress.batch?.processed?:0)>=100||state.poolError.isNotBlank()}
             assertEquals("",state.poolError)
